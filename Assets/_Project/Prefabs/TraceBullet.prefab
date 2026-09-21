@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 8695968076383492887}
   - component: {fileID: 194844243854011358}
   - component: {fileID: 4544480554599725354}
+  - component: {fileID: 3690093371543008411}
   m_Layer: 0
   m_Name: TraceBullet
   m_TagString: Untagged
@@ -27,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 5149279089737911205}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -2.2319014, y: 3.302066, z: 0}
-  m_LocalScale: {x: 0.2, y: 0.2, z: 1}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -97,9 +98,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0da45a62f830de5428958c1d01d4a57a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 6
-  explosionRadius: 0.5
+  speed: 3
+  speedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 2
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 0.5
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  minimumSpeedMultiplier: 0.3
+  bulletCount: 6
+  warningDuration: 0.5
+  bulletInterval: 0.5
+  projectileHitRadius: 0.15
+  explosionRadius: 1
   damage: 1
-  explosionVisualDuration: 0.25
+  explosionVisualDuration: 0.5
   maxLifetime: 30
-  warningColor: {r: 1, g: 0.65, b: 0.15, a: 0.8}
+  warningColor: {r: 1, g: 0.65, b: 0.15, a: 0.5254902}
+  warningWidth: 0.035
+--- !u!58 &3690093371543008411
+CircleCollider2D:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5149279089737911205}
+  m_Enabled: 1
+  m_Density: 1
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_UsedByEffector: 0
+  m_UsedByComposite: 0
+  m_Offset: {x: 0, y: 0}
+  serializedVersion: 2
+  m_Radius: 0.5

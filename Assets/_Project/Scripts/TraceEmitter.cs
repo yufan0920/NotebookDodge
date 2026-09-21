@@ -6,10 +6,13 @@ public class TraceEmitter : MonoBehaviour
     [SerializeField] private TraceBullet dropPrefab;
     [SerializeField] private PlayerHealth player;
     [SerializeField] private Transform muzzle;
+    [Tooltip("启用后等待多少秒，开始第一颗子弹的预警。")]
     [SerializeField, Min(0f)] private float initialDelay = 1f;
+    [Tooltip("每组实际子弹数量。3 就是三颗，不再嵌套连发。")]
     [SerializeField, Min(1)] private int burstCount = 3;
+    [Tooltip("组内相邻两颗开始预警的间隔，单位秒。预警时长相同时，起飞间隔也相同。")]
     [SerializeField, Min(0.05f)] private float shotInterval = 0.6f;
-    [Tooltip("从本组最后一颗子弹发射，到下一组第一颗子弹发射的时间。")]
+    [Tooltip("本组最后一颗开始预警，到下一组第一颗开始预警的间隔。不会等待爆炸。")]
     [SerializeField, Min(0.05f)] private float burstCooldown = 2f;
     private float remaining;
     private int shotsFired;

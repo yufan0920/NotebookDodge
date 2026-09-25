@@ -40,7 +40,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is DirectPatternEmitter || component is TraceEmitter || component is PatternEmitter || component is BounceEmitter)
+            if (component is DirectPatternEmitter || component is TraceEmitter || component is PatternEmitter || component is BounceEmitter || component is LaserEmitter)
                 emitters.Add(component);
         }
         emitters.Sort((a, b) => string.CompareOrdinal(GetPath(a.transform), GetPath(b.transform)));
@@ -72,7 +72,7 @@ public class EmitterTestWindow : EditorWindow
             if (GUILayout.Button("全部关闭")) SetAll(false);
             EditorGUILayout.EndHorizontal();
             using (new EditorGUI.DisabledScope(!EditorApplication.isPlaying))
-                if (GUILayout.Button("清除场上子弹和追踪预警")) ClearProjectiles();
+                if (GUILayout.Button("清除场上子弹、激光和预警")) ClearProjectiles();
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
             foreach (MonoBehaviour emitter in emitters)
@@ -141,7 +141,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is Bullet || component is TraceBullet || component is PatternBullet || component is BounceBullet)
+            if (component is Bullet || component is TraceBullet || component is PatternBullet || component is BounceBullet || component is LaserBeam)
                 Object.Destroy(component.gameObject);
         }
     }

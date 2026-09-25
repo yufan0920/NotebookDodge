@@ -11,8 +11,8 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
+  - Bullet
+  - Emitter
   - 
   - 
   - 
@@ -40,4 +40,10 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Bullet
+    uniqueID: 660470099
+    locked: 0
+  - name: Emitter
+    uniqueID: 1853910331
     locked: 0

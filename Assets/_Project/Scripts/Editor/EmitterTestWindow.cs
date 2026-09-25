@@ -40,7 +40,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is SingleShotEmitter || component is TraceEmitter)
+            if (component is DirectPatternEmitter || component is TraceEmitter || component is PatternEmitter || component is BounceEmitter)
                 emitters.Add(component);
         }
         emitters.Sort((a, b) => string.CompareOrdinal(GetPath(a.transform), GetPath(b.transform)));
@@ -106,7 +106,7 @@ public class EmitterTestWindow : EditorWindow
             }
             EditorGUILayout.EndScrollView();
         }
-        if (emitters.Count == 0) EditorGUILayout.LabelField("未找到 SingleShotEmitter 或 TraceEmitter。");
+        if (emitters.Count == 0) EditorGUILayout.LabelField("未找到可测试的发射器。");
     }
 
     private void SetAll(bool enabled)
@@ -141,7 +141,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is Bullet || component is TraceBullet)
+            if (component is Bullet || component is TraceBullet || component is PatternBullet || component is BounceBullet)
                 Object.Destroy(component.gameObject);
         }
     }

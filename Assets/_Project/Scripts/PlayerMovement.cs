@@ -5,12 +5,14 @@ using UnityEngine.InputSystem;
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField, Min(0f)] private float speed = 4f;
+    [SerializeField] private PlayerMovementArea movementArea;
     // Bounds describe the allowed position of the player's CENTER.
     [SerializeField] private Vector2 minPosition = new Vector2(-7.5f, -4f);
     [SerializeField] private Vector2 maxPosition = new Vector2(7.5f, 4f);
     private Rigidbody2D body;
     private PlayerHealth health;
     private Vector2 input;
+    public PlayerMovementArea MovementArea => movementArea;
 
     private void Awake()
     {
@@ -35,8 +37,15 @@ public class PlayerMovement : MonoBehaviour
     {
         if (health.IsDead) return;
         Vector2 next = body.position + input * speed * Time.fixedDeltaTime;
-        next.x = Mathf.Clamp(next.x, minPosition.x, maxPosition.x);
-        next.y = Mathf.Clamp(next.y, minPosition.y, maxPosition.y);
+        Vector2 constrained;
+        if (movementArea != null && movementArea.isActiveAndEnabled &&
+            movementArea.TryConstrain(next, out constrained))
+            next = constrained;
+        else
+        {
+            next.x = Mathf.Clamp(next.x, minPosition.x, maxPosition.x);
+            next.y = Mathf.Clamp(next.y, minPosition.y, maxPosition.y);
+        }
         body.MovePosition(next);
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class SingleShotEmitter : MonoBehaviour
+public class DirectPatternEmitter : MonoBehaviour
 {
     [SerializeField] private Bullet bulletPrefab;
     [SerializeField] private PlayerHealth player;

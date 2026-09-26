@@ -6,6 +6,8 @@ public class TraceEmitter : MonoBehaviour
     [SerializeField] private TraceBullet dropPrefab;
     [SerializeField] private PlayerHealth player;
     [SerializeField] private Transform muzzle;
+    [SerializeField] private bool aimAtTarget = true;
+    [SerializeField] private Vector2 localAimDirection = Vector2.down;
     [Tooltip("启用后等待多少秒，开始第一颗子弹的预警。")]
     [SerializeField, Min(0f)] private float initialDelay = 1f;
     [Tooltip("每组实际子弹数量。3 就是三颗，不再嵌套连发。")]
@@ -39,6 +41,18 @@ public class TraceEmitter : MonoBehaviour
         if (remaining > 0f) return;
         // 保存坐标值，不把目标 Transform 作为持续追踪的位置来源。
         Vector2 lockedPosition = player.transform.position;
+        if (aimAtTarget)
+        {
+            Vector2 toTarget = lockedPosition - (Vector2)transform.position;
+            if (toTarget.sqrMagnitude > 0.0001f)
+            {
+                Vector2 local = localAimDirection.sqrMagnitude > 0.0001f
+                    ? localAimDirection.normalized : Vector2.down;
+                float targetAngle = Mathf.Atan2(toTarget.y, toTarget.x) * Mathf.Rad2Deg;
+                float localAngle = Mathf.Atan2(local.y, local.x) * Mathf.Rad2Deg;
+                transform.rotation = Quaternion.Euler(0, 0, targetAngle - localAngle);
+            }
+        }
         Vector3 origin = muzzle != null ? muzzle.position : transform.position;
         TraceBullet drop = Instantiate(dropPrefab, origin, Quaternion.identity);
         drop.Initialize(lockedPosition, player);

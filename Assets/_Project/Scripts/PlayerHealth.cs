@@ -15,6 +15,9 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] private AudioClip hurtClip;
     [SerializeField, Range(0f, 1f)] private float hurtVolume = 0.7f;
     private float invincibleUntil;
+    private float nextGroundDamageAt;
+    private bool inBurnArea;
+    private Rigidbody2D body;
     private SpriteRenderer[] visuals;
     private Color[] originalColors;
     private AudioSource hurtSource;
@@ -30,6 +33,7 @@ public class PlayerHealth : MonoBehaviour
     {
         maxHealth = Mathf.Max(1, maxHealth);
         CurrentHealth = maxHealth;
+        body = GetComponent<Rigidbody2D>();
         // 自动找到 Player 下面的角色图片，保存原色，结束反馈后恢复。
         visuals = GetComponentsInChildren<SpriteRenderer>(true);
         originalColors = new Color[visuals.Length];
@@ -46,27 +50,56 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
+        ApplyDamage(amount, false);
+    }
+
+    private void FixedUpdate()
+    {
+        if (IsDead) return;
+        int amount;
+        float interval;
+        Vector2 position = body != null ? body.position : (Vector2)transform.position;
+        if (!GroundArea.TryGetBurn(this, position, out amount, out interval))
+        {
+            inBurnArea = false;
+            return;
+        }
+        if ((!inBurnArea || Time.time >= nextGroundDamageAt) && TakeGroundDamage(amount))
+        {
+            inBurnArea = true;
+            nextGroundDamageAt = Time.time + interval;
+        }
+    }
+
+    public bool TakeGroundDamage(int amount)
+    {
+        return ApplyDamage(amount, true);
+    }
+
+    private bool ApplyDamage(int amount, bool groundDamage)
+    {
         // 无敌期间忽略新伤害；Bullet 仍会按原来的逻辑销毁。
-        if (IsDead || IsInvincible || amount <= 0) return;
+        if (IsDead || IsInvincible || amount <= 0) return false;
         // 先开启保护，保证同一物理步里多颗子弹命中也只扣一次。
-        invincibleUntil = Time.time + invincibilityDuration;
+        if (!groundDamage) invincibleUntil = Time.time + invincibilityDuration;
         CurrentHealth = Mathf.Max(0, CurrentHealth - amount);
         if (feedbackRoutine != null) StopCoroutine(feedbackRoutine);
         RestoreColors();
-        feedbackRoutine = StartCoroutine(PlayHitFeedback());
+        feedbackRoutine = StartCoroutine(PlayHitFeedback(groundDamage));
         // 只有实际接受伤害才播放一次声音，无敌期碰撞不会反复播放。
         if (hurtSource != null && hurtClip != null) hurtSource.PlayOneShot(hurtClip, hurtVolume);
         HealthChanged?.Invoke(CurrentHealth, maxHealth);
         Debug.Log($"HP: {CurrentHealth}/{maxHealth}", this);
         if (IsDead) Debug.Log("Game Over. Stop Play mode and Play again to restart.", this);
+        return true;
     }
 
-    private IEnumerator PlayHitFeedback()
+    private IEnumerator PlayHitFeedback(bool groundDamage)
     {
         float hitStarted = Time.time;
         // 非致命命中时，红闪不能超出保护期；致命命中仍展示一次短促红闪。
-        float redDuration = IsDead ? redFlashDuration : Mathf.Min(redFlashDuration, invincibilityDuration);
-        float feedbackUntil = IsDead ? hitStarted + redDuration : invincibleUntil;
+        float redDuration = IsDead || groundDamage ? redFlashDuration : Mathf.Min(redFlashDuration, invincibilityDuration);
+        float feedbackUntil = IsDead || groundDamage ? hitStarted + redDuration : invincibleUntil;
         while (Time.time < feedbackUntil)
         {
             float elapsed = Time.time - hitStarted;

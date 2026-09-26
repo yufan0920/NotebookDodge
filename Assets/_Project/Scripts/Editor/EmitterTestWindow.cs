@@ -72,7 +72,7 @@ public class EmitterTestWindow : EditorWindow
             if (GUILayout.Button("全部关闭")) SetAll(false);
             EditorGUILayout.EndHorizontal();
             using (new EditorGUI.DisabledScope(!EditorApplication.isPlaying))
-                if (GUILayout.Button("清除场上子弹、激光和预警")) ClearProjectiles();
+                if (GUILayout.Button("清除子弹、激光、地面区域和预警")) ClearProjectiles();
 
             scroll = EditorGUILayout.BeginScrollView(scroll);
             foreach (MonoBehaviour emitter in emitters)
@@ -141,7 +141,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is Bullet || component is TraceBullet || component is PatternBullet || component is BounceBullet || component is LaserBeam)
+            if (component is Bullet || component is TraceBullet || component is PatternBullet || component is BounceBullet || component is LaserBeam || component is GroundArea)
                 Object.Destroy(component.gameObject);
         }
     }

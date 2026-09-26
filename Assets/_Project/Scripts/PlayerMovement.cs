@@ -36,7 +36,8 @@ public class PlayerMovement : MonoBehaviour
     private void FixedUpdate()
     {
         if (health.IsDead) return;
-        Vector2 next = body.position + input * speed * Time.fixedDeltaTime;
+        float areaMultiplier = GroundArea.GetSpeedMultiplier(health, body.position);
+        Vector2 next = body.position + input * speed * areaMultiplier * Time.fixedDeltaTime;
         Vector2 constrained;
         if (movementArea != null && movementArea.isActiveAndEnabled &&
             movementArea.TryConstrain(next, out constrained))

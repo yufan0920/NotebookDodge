@@ -31,18 +31,17 @@ public class TraceBullet : MonoBehaviour
 
 
 
-    [Header("Projectile Hitbox")]
-    // 子弹飞行过程中本身的碰撞半径
-    [SerializeField, Min(0.01f)]
-    private float projectileHitRadius = 0.15f;
 
 
     [Header("Explosion")]
     [SerializeField, Min(0.01f)]
     private float explosionRadius = 0.6f;
 
-    [SerializeField, Min(1)]
+    [SerializeField, Min(0)]
     private int damage = 1;
+
+    [Header("Ground Area (Optional)")]
+    [SerializeField] private GroundArea groundAreaPrefab;
 
     [SerializeField, Min(0.01f)]
     private float explosionVisualDuration = 0.25f;
@@ -132,8 +131,6 @@ public class TraceBullet : MonoBehaviour
 
         projectileCollider.isTrigger = true;
 
-        projectileCollider.radius =
-            projectileHitRadius;
 
         // 预警阶段暂时关闭碰撞
         projectileCollider.enabled = false;
@@ -506,6 +503,18 @@ public class TraceBullet : MonoBehaviour
         // --------------------------------
 
         CreateExplosionRing();
+
+        if (groundAreaPrefab != null && player != null && !player.IsDead)
+        {
+            if (groundAreaPrefab.gameObject.scene.IsValid())
+                Debug.LogError("Ground Area Prefab must be a Project asset.", this);
+            else
+            {
+                GroundArea area = Instantiate(groundAreaPrefab,
+                    new Vector3(explosionPosition.x, explosionPosition.y, 0), Quaternion.identity);
+                area.Initialize(player);
+            }
+        }
 
 
         // --------------------------------

@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.77204883, g: 0.58272517, b: 0.9150943, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -125,9 +125,9 @@ MonoBehaviour:
     m_RotationOrder: 4
   minimumSpeedMultiplier: 0.3
   warningDuration: 0.5
-  projectileHitRadius: 0.15
   explosionRadius: 1
   damage: 1
+  groundAreaPrefab: {fileID: 0}
   explosionVisualDuration: 0.5
   maxLifetime: 30
   warningColor: {r: 1, g: 0.65, b: 0.15, a: 0.5254902}

@@ -40,7 +40,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is DirectPatternEmitter || component is TraceEmitter || component is PatternEmitter || component is BounceEmitter || component is LaserEmitter)
+            if (component is DirectPatternEmitter || component is TraceEmitter || component is PatternEmitter || component is BounceEmitter || component is LaserEmitter || component is ImpactEmitter)
                 emitters.Add(component);
         }
         emitters.Sort((a, b) => string.CompareOrdinal(GetPath(a.transform), GetPath(b.transform)));
@@ -141,7 +141,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is Bullet || component is TraceBullet || component is PatternBullet || component is BounceBullet || component is LaserBeam || component is GroundArea)
+            if (component is Bullet || component is TraceBullet || component is PatternBullet || component is BounceBullet || component is LaserBeam || component is GroundArea || component is ImpactBullet)
                 Object.Destroy(component.gameObject);
         }
     }

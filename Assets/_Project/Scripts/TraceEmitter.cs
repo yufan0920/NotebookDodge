@@ -18,6 +18,7 @@ public class TraceEmitter : MonoBehaviour
     [SerializeField, Min(0.05f)] private float burstCooldown = 2f;
     private float remaining;
     private int shotsFired;
+    private TraceBullet preparingDrop;
 
     private void OnEnable()
     {
@@ -37,11 +38,32 @@ public class TraceEmitter : MonoBehaviour
     private void Update()
     {
         if (player == null || player.IsDead || dropPrefab == null) return;
+        if (preparingDrop != null && preparingDrop.IsPreparing) return;
         remaining -= Time.deltaTime;
         if (remaining > 0f) return;
         // 保存坐标值，不把目标 Transform 作为持续追踪的位置来源。
         Vector2 lockedPosition = player.transform.position;
-        if (aimAtTarget)
+        AimAt(lockedPosition);
+        Transform source = muzzle != null ? muzzle : transform;
+        TraceBullet drop = Instantiate(dropPrefab, source.position, Quaternion.identity);
+        if (drop.HasTrackingWarning)
+        {
+            preparingDrop = drop;
+            drop.Initialize(lockedPosition, player, source, AimAt);
+        }
+        else drop.Initialize(lockedPosition, player);
+        shotsFired++;
+        if (shotsFired >= Mathf.Max(1, burstCount))
+        {
+            shotsFired = 0;
+            remaining = Mathf.Max(0.05f, burstCooldown);
+        }
+        else remaining = Mathf.Max(0.05f, shotInterval);
+    }
+
+    private void AimAt(Vector2 lockedPosition)
+    {
+        if (this != null && aimAtTarget)
         {
             Vector2 toTarget = lockedPosition - (Vector2)transform.position;
             if (toTarget.sqrMagnitude > 0.0001f)
@@ -53,15 +75,5 @@ public class TraceEmitter : MonoBehaviour
                 transform.rotation = Quaternion.Euler(0, 0, targetAngle - localAngle);
             }
         }
-        Vector3 origin = muzzle != null ? muzzle.position : transform.position;
-        TraceBullet drop = Instantiate(dropPrefab, origin, Quaternion.identity);
-        drop.Initialize(lockedPosition, player);
-        shotsFired++;
-        if (shotsFired >= Mathf.Max(1, burstCount))
-        {
-            shotsFired = 0;
-            remaining = Mathf.Max(0.05f, burstCooldown);
-        }
-        else remaining = Mathf.Max(0.05f, shotInterval);
     }
 }

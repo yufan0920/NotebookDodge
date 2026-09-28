@@ -124,14 +124,19 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   minimumSpeedMultiplier: 0.3
-  warningDuration: 0.5
-  explosionRadius: 1.5
-  damage: 1
-  groundAreaPrefab: {fileID: 2516194728152282235, guid: 5a1189502dd38174b9eba9110a1fb943, type: 3}
-  explosionVisualDuration: 0.5
-  maxLifetime: 30
+  trackDuringWarning: 1
+  preLaunchDuration: 1
+  trackingSmoothTime: 0.05
   warningColor: {r: 0.15566039, g: 0.82831115, b: 1, a: 0.5254902}
   warningWidth: 0.035
+  flightTrackingDuration: 0
+  turnSpeed: 360
+  explodeOnPlayerContact: 0
+  explosionRadius: 1.5
+  damage: 1
+  explosionVisualDuration: 0.5
+  groundAreaPrefab: {fileID: 2516194728152282235, guid: 5a1189502dd38174b9eba9110a1fb943, type: 3}
+  maxLifetime: 30
 --- !u!58 &8249067948354806160
 CircleCollider2D:
   m_ObjectHideFlags: 0

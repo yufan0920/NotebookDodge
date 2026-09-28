@@ -98,7 +98,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0da45a62f830de5428958c1d01d4a57a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 3
+  speed: 3.5
   speedCurve:
     serializedVersion: 2
     m_Curve:
@@ -123,15 +123,20 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  minimumSpeedMultiplier: 0.3
-  warningDuration: 0.5
-  explosionRadius: 1
-  damage: 0
-  groundAreaPrefab: {fileID: 7490903679174266964, guid: 5d22d1d6c66aa13468fc184821ebcb57, type: 3}
-  explosionVisualDuration: 0.5
-  maxLifetime: 30
+  minimumSpeedMultiplier: 0.5
+  trackDuringWarning: 1
+  preLaunchDuration: 0.5
+  trackingSmoothTime: 0.05
   warningColor: {r: 1, g: 0.1490196, b: 0.23469254, a: 0.5254902}
   warningWidth: 0.035
+  flightTrackingDuration: 2
+  turnSpeed: 720
+  explodeOnPlayerContact: 0
+  explosionRadius: 1
+  damage: 0
+  explosionVisualDuration: 0.5
+  groundAreaPrefab: {fileID: 7490903679174266964, guid: 5d22d1d6c66aa13468fc184821ebcb57, type: 3}
+  maxLifetime: 30
 --- !u!58 &9144946559206248222
 CircleCollider2D:
   m_ObjectHideFlags: 0

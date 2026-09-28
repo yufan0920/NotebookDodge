@@ -124,7 +124,8 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   minimumSpeedMultiplier: 0.3
-  warningDuration: 0.5
+  trackingDuration: 0.5
+  trackDuringWarning: 0
   explosionRadius: 1
   damage: 1
   groundAreaPrefab: {fileID: 0}

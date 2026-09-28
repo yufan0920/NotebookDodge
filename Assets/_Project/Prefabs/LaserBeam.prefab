@@ -48,6 +48,7 @@ MonoBehaviour:
   warningWidth: 0.035
   warningColor: {r: 0.754717, g: 0.26820347, b: 0.16731933, a: 0.85}
   chargeDuration: 1.5
+  chargeAdvanceDistance: 0.3
   accelerationDuration: 0.12
   speedCurve:
     serializedVersion: 2
@@ -89,6 +90,6 @@ MonoBehaviour:
   beamColor: {r: 1, g: 0.8269428, b: 0.10196078, a: 0.65}
   damage: 1
   damageInterval: 0.5
-  holdDuration: 4
-  fadeDuration: 0.25
+  holdDuration: 1.5
+  fadeDuration: 0.2
   sortingOrder: 10

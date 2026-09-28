@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19b07957fb2693d4ca1a70b57e5cf51d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  warningDuration: 1
+  warningDuration: 3.5
   warningColor: {r: 1, g: 0.65, b: 0.15, a: 0.8}
   warningWidth: 0.035
   fallingVisual: {fileID: 7133863945492418695}
@@ -75,7 +75,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  explosionRadius: 1
+  explosionRadius: 0.4
   damage: 1
   explosionVisualDuration: 0.25
   fragmentPrefab: {fileID: 185456524195875525, guid: 72f7b208f68f5c84f87a860490d42702, type: 3}

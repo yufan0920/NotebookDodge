@@ -24,47 +24,33 @@ public class TraceBullet : MonoBehaviour
 
 
     [Header("Pre-launch Warning")]
+    [SerializeField] private bool trackDuringWarning = true;
+    [UnityEngine.Serialization.FormerlySerializedAs("trackingDuration")]
+    [SerializeField, Min(0f)] private float preLaunchDuration;
+    [SerializeField, Min(0f)] private float trackingSmoothTime;
+    [SerializeField] private Color warningColor = new Color(1f, 0.65f, 0.15f, 0.8f);
+    [SerializeField, Min(0.001f)] private float warningWidth = 0.035f;
 
-    // 每颗锁定后多久发射
-    [SerializeField, Min(0f)]
-    private float warningDuration = 0.5f;
-
-
-
-
+    [Header("Flight Tracking")]
+    [SerializeField, Min(0f)] private float flightTrackingDuration;
+    [SerializeField, Min(1f)] private float turnSpeed = 360f;
 
     [Header("Explosion")]
-    [SerializeField, Min(0.01f)]
-    private float explosionRadius = 0.6f;
-
-    [SerializeField, Min(0)]
-    private int damage = 1;
+    [SerializeField] private bool explodeOnPlayerContact = true;
+    [SerializeField, Min(0.01f)] private float explosionRadius = 0.6f;
+    [SerializeField, Min(0)] private int damage = 1;
+    [SerializeField, Min(0.01f)] private float explosionVisualDuration = 0.25f;
 
     [Header("Ground Area (Optional)")]
     [SerializeField] private GroundArea groundAreaPrefab;
 
-    [SerializeField, Min(0.01f)]
-    private float explosionVisualDuration = 0.25f;
-
-
     [Header("Lifetime")]
-    [SerializeField, Min(0.1f)]
-    private float maxLifetime = 30f;
+    [SerializeField, Min(0.1f)] private float maxLifetime = 30f;
 
-
-    [Header("Warning")]
-    [SerializeField]
-    private Color warningColor =
-        new Color(
-            1f,
-            0.65f,
-            0.15f,
-            0.8f
-        );
-
-    [SerializeField, Min(0.001f)]
-    private float warningWidth = 0.035f;
-
+    public bool IsPreparing => initialized && !launched && !exploded;
+    public bool HasTrackingWarning => trackDuringWarning && preLaunchDuration > 0f;
+    private Transform launchOrigin;
+    private System.Action<Vector2> aimAtPosition;
 
     // ========================================
     // Runtime
@@ -87,13 +73,20 @@ public class TraceBullet : MonoBehaviour
     private float explosionAge;
     private float radius;
     private float startDistance;
+    private float flightAge;
+    private Vector2 flightDirection;
+    private Vector2 flightTrackingVelocity;
 
     // 每次调用只初始化当前这一颗子弹。连发数量与间隔统一由 TraceEmitter 控制。
     public void Initialize(
         Vector2 lockedPosition,
-        PlayerHealth targetPlayer)
+        PlayerHealth targetPlayer,
+        Transform origin = null,
+        System.Action<Vector2> aim = null)
     {
         StopAllCoroutines();
+        launchOrigin = origin;
+        aimAtPosition = aim;
 
 
         target =
@@ -151,7 +144,7 @@ public class TraceBullet : MonoBehaviour
 
 
         // --------------------------------
-        // 等待 warningDuration 后起飞，期间落点不再改变
+        // 完成预警后起飞。
         // --------------------------------
 
         StartCoroutine(
@@ -175,10 +168,32 @@ public class TraceBullet : MonoBehaviour
 
     private IEnumerator LaunchAfterWarning()
     {
-        yield return
-            new WaitForSeconds(
-                warningDuration
-            );
+        float trackingTime = Mathf.Max(0f, preLaunchDuration);
+        bool continuousTracking = flightTrackingDuration > 0f;
+        flightTrackingVelocity = Vector2.zero;
+        for (float elapsed = 0f; elapsed < trackingTime; elapsed += Time.deltaTime)
+        {
+            if (player == null || player.IsDead)
+            {
+                Destroy(gameObject);
+                yield break;
+            }
+            if (trackDuringWarning)
+                target = trackingSmoothTime > 0f
+                ? Vector2.SmoothDamp(target, player.transform.position, ref flightTrackingVelocity,
+                    trackingSmoothTime, Mathf.Infinity, Time.deltaTime)
+                : (Vector2)player.transform.position;
+            UpdateWarningPosition();
+            aimAtPosition?.Invoke(target);
+            yield return null;
+        }
+        if (trackingTime > 0f && player != null && !player.IsDead)
+        {
+            UpdateWarningPosition();
+            aimAtPosition?.Invoke(target);
+            if (!continuousTracking)
+                ring.startColor = ring.endColor = Color.Lerp(warningColor, Color.white, 0.5f);
+        }
 
 
         if (
@@ -190,6 +205,11 @@ public class TraceBullet : MonoBehaviour
             yield break;
         }
 
+
+        aimAtPosition?.Invoke(target);
+        if (launchOrigin != null) transform.position = launchOrigin.position;
+        aimAtPosition = null;
+        launchOrigin = null;
 
         // 真正发射这一刻记录距离
         startDistance =
@@ -203,9 +223,11 @@ public class TraceBullet : MonoBehaviour
         visual.enabled = true;
 
         // 开启飞行碰撞
-        projectileCollider.enabled = true;
+        projectileCollider.enabled = explodeOnPlayerContact;
 
         launched = true;
+        flightAge = 0f;
+        flightDirection = (target - (Vector2)transform.position).normalized;
     }
 
 
@@ -258,6 +280,11 @@ public class TraceBullet : MonoBehaviour
             warningColor;
 
 
+        UpdateWarningPosition();
+    }
+
+    private void UpdateWarningPosition()
+    {
         for (
             int i = 0;
             i < ring.positionCount;
@@ -316,6 +343,19 @@ public class TraceBullet : MonoBehaviour
         }
 
 
+        if (flightAge < flightTrackingDuration)
+        {
+            float trackingStep = Mathf.Min(Time.fixedDeltaTime, flightTrackingDuration - flightAge);
+            target = trackingSmoothTime > 0f
+                ? Vector2.SmoothDamp(target, player.transform.position, ref flightTrackingVelocity,
+                    trackingSmoothTime, Mathf.Infinity, trackingStep)
+                : (Vector2)player.transform.position;
+            UpdateWarningPosition();
+            if (flightAge + Time.fixedDeltaTime >= flightTrackingDuration)
+                ring.startColor = ring.endColor = Color.Lerp(warningColor, Color.white, 0.5f);
+        }
+        flightAge += Time.fixedDeltaTime;
+
         // 当前距离目标还有多远
         float remainingDistance =
             Vector2.Distance(
@@ -367,6 +407,16 @@ public class TraceBullet : MonoBehaviour
                 Time.fixedDeltaTime
             );
 
+        if (flightTrackingDuration > 0f && remainingDistance > currentSpeed * Time.fixedDeltaTime)
+        {
+            Vector2 desiredDirection = (target - (Vector2)transform.position).normalized;
+            if (flightDirection.sqrMagnitude < 0.0001f) flightDirection = desiredDirection;
+            float angle = Vector2.SignedAngle(flightDirection, desiredDirection);
+            float rotation = Mathf.Clamp(angle, -turnSpeed * Time.fixedDeltaTime, turnSpeed * Time.fixedDeltaTime);
+            flightDirection = Quaternion.Euler(0f, 0f, rotation) * flightDirection;
+            next = (Vector2)transform.position + flightDirection * currentSpeed * Time.fixedDeltaTime;
+        }
+
 
         transform.position =
             new Vector3(
@@ -398,6 +448,7 @@ public class TraceBullet : MonoBehaviour
     private void OnTriggerEnter2D(
         Collider2D other)
     {
+        if (!explodeOnPlayerContact) return;
         if (
 
             !launched ||

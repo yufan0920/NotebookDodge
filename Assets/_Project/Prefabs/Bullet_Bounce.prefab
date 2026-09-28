@@ -99,6 +99,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 3
   damage: 1
-  lifetime: 12
-  maxBounces: 3
+  lifetime: 300
+  maxBounces: 100
   hitRadius: 0.1

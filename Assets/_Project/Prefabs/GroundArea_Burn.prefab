@@ -45,7 +45,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   radius: 1
-  lifetime: 120
+  lifetime: 45
   burnEnabled: 1
   damage: 1
   damageInterval: 1

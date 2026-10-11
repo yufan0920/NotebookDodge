@@ -60,6 +60,11 @@ public class EmitterTestWindow : EditorWindow
 
     private void OnGUI()
     {
+        if (FindObjectOfType<AttackTimelineController>() != null)
+        {
+            EditorGUILayout.HelpBox("当前场景由时间轴控制。请使用 Tools > Notebook Dodge > Attack Timeline；单发射器测试请打开 Prototype。", MessageType.Info);
+            return;
+        }
         EditorGUILayout.HelpBox("可在 Play 前配置开关，Ctrl+S 保存到场景；支持 Ctrl+Z 撤销。\nPlay 中也可切换，但运行中的调整通常不会保留。关闭发射不会删除已有子弹。", MessageType.Info);
         if (GUILayout.Button("刷新列表 / Refresh")) Refresh();
 

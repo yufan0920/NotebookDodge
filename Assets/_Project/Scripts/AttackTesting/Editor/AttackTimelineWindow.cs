@@ -2,6 +2,7 @@ using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
+//Attack Timeline 面板，用来编辑编排和控制测试播放
 public class AttackTimelineWindow : EditorWindow
 {
     private Vector2 scroll;
@@ -45,7 +46,14 @@ public class AttackTimelineWindow : EditorWindow
             EditorGUILayout.LabelField("Active Trace Bullets", FindObjectsOfType<TraceBullet>().Length.ToString());
             EditorGUILayout.LabelField("Active Lasers", FindObjectsOfType<LaserBeam>().Length.ToString());
         }
-        EditorGUILayout.HelpBox("Move keeps the previous emitter on screen and moves it to the next clip. Reenter exits and creates a new instance. Transitions wait for active warnings or lasers; missed clips are skipped, not replayed. First Shot Delay starts after entry.", MessageType.None);
+        EditorGUILayout.HelpBox("Move keeps the previous emitter on screen and moves it to the next clip. Reenter exits and creates a new instance. Transitions wait for active warnings or lasers; missed clips are skipped, not replayed. Attack Times are absolute loop seconds, including burst starts. Busy or missed shots are skipped and logged; they never shift later times.", MessageType.None);
+        if (EditorApplication.isPlaying && controller.AttackLog.Count > 0)
+        {
+            EditorGUILayout.LabelField("Recent Attacks (Planned / Actual)", EditorStyles.boldLabel);
+            for (int i = Mathf.Max(0, controller.AttackLog.Count - 6); i < controller.AttackLog.Count; i++)
+                EditorGUILayout.LabelField(controller.AttackLog[i], EditorStyles.wordWrappedMiniLabel);
+            if (GUILayout.Button("Copy Attack Log")) EditorGUIUtility.systemCopyBuffer = string.Join("\n", controller.AttackLog);
+        }
         scroll = EditorGUILayout.BeginScrollView(scroll);
         using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
         {
@@ -85,11 +93,12 @@ public class AttackTimelineWindow : EditorWindow
                             Field(clip, "position", "Position");
                             Field(clip, "rotationZ", "Rotation Z");
                             EditorGUILayout.LabelField("Firing Window", EditorStyles.boldLabel);
-                            Field(clip, "firstShotDelay", "First Shot Delay (s)");
+                            EditorGUILayout.PropertyField(clip.FindPropertyRelative("attackTimes"), new GUIContent("Attack Times (Loop Seconds)"), true);
                             Field(clip, "stopAt", "Stop At (s)");
                             Field(clip, "exitDuration", "Exit Duration (s)");
                             EditorGUILayout.LabelField("Attack Settings", EditorStyles.boldLabel);
-                            AttackSettingsGUI.Draw(clip.FindPropertyRelative("attack"), template);
+                            AttackSettingsGUI.Draw(clip.FindPropertyRelative("attack"), template, true);
+                            AttackTimingPreview.Draw(clip, template);
                             using (new EditorGUILayout.HorizontalScope())
                             {
                                 if (GUILayout.Button("Duplicate Clip"))
@@ -100,6 +109,8 @@ public class AttackTimelineWindow : EditorWindow
                                     float stop = copy.FindPropertyRelative("stopAt").floatValue;
                                     copy.FindPropertyRelative("appearAt").floatValue = stop;
                                     copy.FindPropertyRelative("stopAt").floatValue = stop + (stop - start);
+                                    var times = copy.FindPropertyRelative("attackTimes");
+                                    for (int i = 0; i < times.arraySize; i++) times.GetArrayElementAtIndex(i).floatValue += stop - start;
                                     copy.FindPropertyRelative("label").stringValue += " Copy";
                                     break;
                                 }
@@ -107,6 +118,7 @@ public class AttackTimelineWindow : EditorWindow
                             }
                         }
                     }
+                    AttackTimingPreview.DrawTrackConflicts(clips, template);
                     if (GUILayout.Button("Add Clip"))
                     {
                         int index = clips.arraySize++;
@@ -122,7 +134,10 @@ public class AttackTimelineWindow : EditorWindow
                         clip.FindPropertyRelative("transition").enumValueIndex = 0;
                         clip.FindPropertyRelative("enterDuration").floatValue = 0.5f;
                         clip.FindPropertyRelative("exitDuration").floatValue = 0.5f;
-                        clip.FindPropertyRelative("firstShotDelay").floatValue = 0;
+                        var times = clip.FindPropertyRelative("attackTimes");
+                        times.ClearArray();
+                        times.arraySize = 1;
+                        times.GetArrayElementAtIndex(0).floatValue = 0.5f;
                         AttackSettingsGUI.Reset(clip.FindPropertyRelative("attack"), template);
                         clip.isExpanded = true;
                     }

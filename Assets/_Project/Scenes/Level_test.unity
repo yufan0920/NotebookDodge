@@ -1029,7 +1029,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1053669312}
-  duration: 60
+  duration: 65
   playOnStart: 1
   tracks:
   - label: Fan 0-20
@@ -1040,8 +1040,8 @@ MonoBehaviour:
       enabled: 1
       transition: 0
       attack:
-        bulletCount: 4
-        spreadAngle: 50
+        bulletCount: 5
+        spreadAngle: 70
         aimAtPlayer: 0
         burstCount: 1
         shotInterval: 0.5
@@ -1049,11 +1049,14 @@ MonoBehaviour:
         landingPoints: []
       appearAt: 0
       stopAt: 20
-      position: {x: 5.5, y: 4, z: 0}
-      rotationZ: -30
+      position: {x: 6, y: 4, z: 0}
+      rotationZ: -45
       entrySide: 0
       enterDuration: 1
-      firstShotDelay: 0
+      attackTimes:
+      - 1
+      - 8
+      - 15
       exitDuration: 1
   - label: Trace 10-60
     enabled: 1
@@ -1076,7 +1079,13 @@ MonoBehaviour:
       rotationZ: 0
       entrySide: 0
       enterDuration: 1
-      firstShotDelay: 0
+      attackTimes:
+      - 11
+      - 20
+      - 29
+      - 38
+      - 47
+      - 56
       exitDuration: 1
   - label: Laser 1 20-60
     enabled: 1
@@ -1099,8 +1108,9 @@ MonoBehaviour:
       rotationZ: 90
       entrySide: 0
       enterDuration: 1
-      firstShotDelay: 0
-      exitDuration: 1
+      attackTimes:
+      - 23
+      exitDuration: 0.5
     - label: left to right
       enabled: 1
       transition: 0
@@ -1118,8 +1128,29 @@ MonoBehaviour:
       rotationZ: -90
       entrySide: 0
       enterDuration: 1
-      firstShotDelay: 0
+      attackTimes:
+      - 36
       exitDuration: 1
+    - label: cross
+      enabled: 1
+      transition: 0
+      attack:
+        bulletCount: 1
+        spreadAngle: 40
+        aimAtPlayer: 0
+        burstCount: 1
+        shotInterval: 0.5
+        cooldown: 2
+        landingPoints: []
+      appearAt: 48
+      stopAt: 59
+      position: {x: 8.5, y: 0, z: 0}
+      rotationZ: 90
+      entrySide: 0
+      enterDuration: 1
+      attackTimes:
+      - 49
+      exitDuration: 0.5
   - label: Laser 2 20-60
     enabled: 1
     emitterTemplate: {fileID: 1469203815}
@@ -1141,7 +1172,8 @@ MonoBehaviour:
       rotationZ: 90
       entrySide: 0
       enterDuration: 1
-      firstShotDelay: 0
+      attackTimes:
+      - 24
       exitDuration: 1
     - label: left to right
       enabled: 1
@@ -1160,7 +1192,28 @@ MonoBehaviour:
       rotationZ: -90
       entrySide: 0
       enterDuration: 1
-      firstShotDelay: 0
+      attackTimes:
+      - 37
+      exitDuration: 0.5
+    - label: cross
+      enabled: 1
+      transition: 0
+      attack:
+        bulletCount: 1
+        spreadAngle: 40
+        aimAtPlayer: 0
+        burstCount: 1
+        shotInterval: 0.5
+        cooldown: 5
+        landingPoints: []
+      appearAt: 49
+      stopAt: 60
+      position: {x: 0, y: -5, z: 0}
+      rotationZ: 0
+      entrySide: 0
+      enterDuration: 1
+      attackTimes:
+      - 50
       exitDuration: 0.5
   - label: Bounce 40-60
     enabled: 1
@@ -1170,7 +1223,7 @@ MonoBehaviour:
       enabled: 1
       transition: 0
       attack:
-        bulletCount: 4
+        bulletCount: 1
         spreadAngle: 0
         aimAtPlayer: 1
         burstCount: 1
@@ -1183,7 +1236,10 @@ MonoBehaviour:
       rotationZ: 0
       entrySide: 0
       enterDuration: 1
-      firstShotDelay: 0
+      attackTimes:
+      - 41
+      - 49
+      - 57
       exitDuration: 1
   sceneEmitters:
   - {fileID: 49424481}

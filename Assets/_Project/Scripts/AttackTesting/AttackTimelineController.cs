@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+//执行整段编排：管理track、clip、发射器入场、移动、退场和清场
 [DefaultExecutionOrder(-200)]
 public class AttackTimelineController : MonoBehaviour
 {
@@ -22,12 +23,13 @@ public class AttackTimelineController : MonoBehaviour
         public float rotationZ;
         public EntrySide entrySide;
         [Min(0)] public float enterDuration = 0.5f;
-        [Min(0)] public float firstShotDelay;
+        public List<float> attackTimes = new List<float>();
         [Min(0)] public float exitDuration = 0.5f;
         public Cue Copy()
         {
             var copy = (Cue)MemberwiseClone();
             copy.attack = attack.Copy();
+            copy.attackTimes = new List<float>(attackTimes);
             return copy;
         }
     }
@@ -51,7 +53,8 @@ public class AttackTimelineController : MonoBehaviour
         public Cue cue;
         public MonoBehaviour template;
         public RunningCue previous, next;
-        public AttackSequence sequence;
+        public AbsoluteAttackSchedule sequence;
+        public bool ready;
         public float enteredAt, startAngle;
         public Vector3 entryOrigin;
         public GameObject instance;
@@ -63,6 +66,7 @@ public class AttackTimelineController : MonoBehaviour
     }
     private readonly List<RunningCue> running = new List<RunningCue>();
     private bool initialized, ending;
+    public readonly List<string> AttackLog = new List<string>();
     public float Elapsed { get; private set; }
     public float Duration => duration;
     public bool IsRunning { get; private set; }
@@ -91,6 +95,7 @@ public class AttackTimelineController : MonoBehaviour
         initialized = true;
         ending = false;
         Elapsed = 0;
+        AttackLog.Clear();
         foreach (Track track in tracks)
         {
             if (!track.enabled) continue;
@@ -100,6 +105,7 @@ public class AttackTimelineController : MonoBehaviour
             foreach (Cue cue in ordered)
             {
                 var state = new RunningCue { cue = cue.Copy(), template = track.emitterTemplate, previous = previous };
+                state.sequence = new AbsoluteAttackSchedule(cue.attackTimes, cue.attack.burstCount, cue.attack.shotInterval);
                 if (previous != null) previous.next = state;
                 running.Add(state);
                 previous = state;
@@ -121,15 +127,26 @@ public class AttackTimelineController : MonoBehaviour
             foreach (Cue cue in ordered)
             {
                 string prefix = track.label + " / " + cue.label + ": ";
-                if (cue.enterDuration < 0 || cue.firstShotDelay < 0 || cue.exitDuration < 0) return prefix + "Animation durations and delays cannot be negative.";
+                if (cue.enterDuration < 0 || cue.exitDuration < 0) return prefix + "Animation durations and delays cannot be negative.";
                 if (cue.appearAt < 0 || cue.appearAt >= duration) return prefix + "Appear At must be within the loop.";
-                if (cue.stopAt > duration || cue.stopAt <= cue.appearAt + cue.enterDuration + cue.firstShotDelay)
-                    return prefix + "Stop At must be after entry + First Shot Delay and within the loop.";
+                if (cue.stopAt > duration || cue.stopAt <= cue.appearAt + cue.enterDuration)
+                    return prefix + "Stop At must be after entry and within the loop.";
                 if (cue.appearAt < previousStop) return prefix + "Clips on one track cannot overlap. Use another track for simultaneous emitters.";
-                if (cue.attack == null || cue.attack.cooldown < 0.05f || cue.attack.shotInterval < 0.05f || cue.attack.burstCount < 1 || cue.attack.bulletCount < 1)
+                if (cue.attack == null || cue.attack.shotInterval < 0.05f || cue.attack.burstCount < 1 || cue.attack.bulletCount < 1)
                     return prefix + "Attack counts must be positive; intervals must be at least 0.05 s.";
                 if (track.emitterTemplate is ImpactEmitter && (cue.attack.landingPoints == null || cue.attack.landingPoints.Length == 0))
                     return prefix + "Add at least one Landing Point.";
+                if (cue.attackTimes == null || cue.attackTimes.Count == 0) return prefix + "Add at least one Attack Time (loop seconds).";
+                if ((long)cue.attackTimes.Count * cue.attack.burstCount > 10000) return prefix + "Too many scheduled shots (maximum 10000 per clip).";
+                var shots = AbsoluteAttackSchedule.Expand(cue.attackTimes, cue.attack.burstCount, cue.attack.shotInterval);
+                float lastShot = -1;
+                foreach (var shot in shots)
+                {
+                    if (float.IsNaN(shot.time) || float.IsInfinity(shot.time) || shot.time < cue.appearAt + cue.enterDuration || shot.time >= cue.stopAt)
+                        return prefix + "Every shot, including burst shots, must be after entry and before Stop At.";
+                    if (shot.time - lastShot < 0.0001f) return prefix + "Duplicate shot time: " + shot.time.ToString("F2") + " s.";
+                    lastShot = shot.time;
+                }
                 previousStop = cue.stopAt;
             }
         }
@@ -160,6 +177,28 @@ public class AttackTimelineController : MonoBehaviour
     }
 
     private void Tick(RunningCue state)
+    {
+        state.ready = false;
+        TickPlacement(state);
+        if (ending) return;
+        state.sequence.Tick(Elapsed, index =>
+        {
+            if (!state.ready || state.instance == null) return "Emitter not in position / clip ended";
+            if (!state.emitter.CanFire) return "Previous attack still active";
+            if (!state.emitter.Fire(state.cue.attack, player, index)) return "Emitter busy or projectile setup invalid";
+            state.emitting = true;
+            return null;
+        }, (planned, actual, reason) =>
+        {
+            string record = state.cue.label + " | planned " + planned.ToString("F2") + " s | "
+                + (reason == null ? "fired " + actual.ToString("F2") + " s" : "SKIPPED: " + reason);
+            AttackLog.Add(record);
+            if (AttackLog.Count > 200) AttackLog.RemoveAt(0);
+            if (reason != null) Debug.LogWarning(record, this);
+        });
+    }
+
+    private void TickPlacement(RunningCue state)
     {
         Cue cue = state.cue;
         if (state.finished || Elapsed < cue.appearAt) return;
@@ -206,8 +245,7 @@ public class AttackTimelineController : MonoBehaviour
             }
             state.instance.name = "Timeline " + cue.label;
             state.offscreen = GetOffscreenPosition(state.instance, cue);
-            state.enteredAt = Elapsed;
-            state.sequence = new AttackSequence();
+            state.enteredAt = Elapsed - cue.appearAt <= AbsoluteAttackSchedule.MaxFrameLateness ? cue.appearAt : Elapsed;
             state.spawned = true;
         }
         if (state.instance == null) { state.finished = true; return; }
@@ -231,16 +269,7 @@ public class AttackTimelineController : MonoBehaviour
         state.instance.transform.position = Vector3.Lerp(state.entryOrigin, cue.position, Mathf.SmoothStep(0, 1, entry));
         if (!state.emitting)
             state.instance.transform.rotation = Quaternion.Euler(0, 0, Mathf.LerpAngle(state.startAngle, cue.rotationZ, Mathf.SmoothStep(0, 1, entry)));
-        if (entry >= 1 && Elapsed >= state.enteredAt + cue.enterDuration + cue.firstShotDelay)
-        {
-            state.emitting = true;
-            state.sequence.Tick(Time.deltaTime, state.emitter, cue.attack, player);
-            if (state.sequence.Failed)
-            {
-                Debug.LogError("Emission failed: " + cue.label + ". Check the projectile prefab and attack settings.", this);
-                BeginExit(state);
-            }
-        }
+        state.ready = Elapsed + 0.0001f >= state.enteredAt + cue.enterDuration;
     }
 
     private void BeginExit(RunningCue state)

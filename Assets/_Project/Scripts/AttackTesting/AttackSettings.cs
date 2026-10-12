@@ -1,6 +1,7 @@
 using System;
 using UnityEngine;
 
+//保存数量、夹角、连射等参数。文件中还包含 Prototype 使用的循环调度逻辑
 [Serializable]
 public class AttackSettings
 {

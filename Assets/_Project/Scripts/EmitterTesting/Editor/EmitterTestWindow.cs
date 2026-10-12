@@ -1,9 +1,10 @@
-// 放在 Editor 文件夹：仅供 Unity 编辑器测试，不会编译进游戏包。
+// 放在 Editor 文件夹：仅供 Unity 编辑器测试，不会编译进游戏包
 using System.Collections.Generic;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 
+// Emitter Tests 面板：开启、关闭、单独测试某个发射器，以及清场
 public class EmitterTestWindow : EditorWindow
 {
     private readonly List<MonoBehaviour> emitters = new List<MonoBehaviour>();
@@ -40,7 +41,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is DirectPatternEmitter || component is TraceEmitter || component is PatternEmitter || component is BounceEmitter || component is LaserEmitter || component is ImpactEmitter)
+            if (component is TraceEmitter || component is PatternEmitter || component is BounceEmitter || component is LaserEmitter || component is ImpactEmitter)
                 emitters.Add(component);
         }
         emitters.Sort((a, b) => string.CompareOrdinal(GetPath(a.transform), GetPath(b.transform)));

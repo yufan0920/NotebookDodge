@@ -1,6 +1,7 @@
 using UnityEngine;
 
 // Prototype-only orchestration. Timeline instances disable this component.
+// 单独测试时，按照初始等待、连射、冷却，让发射器循环攻击
 public class EmitterTestDriver : MonoBehaviour
 {
     [SerializeField] private MonoBehaviour emitter;

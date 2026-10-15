@@ -147,14 +147,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 49424481}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cbc52262d9aee784782ceabcb8576eee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dropPrefab: {fileID: 4544480554599725354, guid: adc01221002d39b43b17f1f2502e62b1, type: 3}
-  muzzle: {fileID: 0}
   localForwardDirection: {x: 0, y: -1}
+  muzzle: {fileID: 0}
 --- !u!4 &49424483
 Transform:
   m_ObjectHideFlags: 0
@@ -539,7 +539,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 498164386}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bc90517e8bf307640985d7fb3bb115b3, type: 3}
   m_Name: 
@@ -593,8 +593,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   dropPrefab: {fileID: 8800170911329718558, guid: 193de212985dd9f4e825c53a195fe12b, type: 3}
-  muzzle: {fileID: 0}
   localForwardDirection: {x: 0, y: -1}
+  muzzle: {fileID: 0}
 --- !u!4 &510946651
 Transform:
   m_ObjectHideFlags: 0
@@ -726,8 +726,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beamPrefab: {fileID: 4680034347202167125, guid: 7af3e778cf9b6cf4c831da2b66c8b67d, type: 3}
-  muzzle: {fileID: 0}
   localForwardDirection: {x: 1, y: 0}
+  muzzle: {fileID: 0}
 --- !u!4 &592221680
 Transform:
   m_ObjectHideFlags: 0
@@ -775,8 +775,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beamPrefab: {fileID: 4680034347202167125, guid: 7af3e778cf9b6cf4c831da2b66c8b67d, type: 3}
-  muzzle: {fileID: 0}
   localForwardDirection: {x: 1, y: 0}
+  muzzle: {fileID: 0}
 --- !u!4 &592701589
 Transform:
   m_ObjectHideFlags: 0
@@ -2238,8 +2238,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beamPrefab: {fileID: 4680034347202167125, guid: 7af3e778cf9b6cf4c831da2b66c8b67d, type: 3}
-  muzzle: {fileID: 0}
   localForwardDirection: {x: 0, y: 1}
+  muzzle: {fileID: 0}
 --- !u!4 &1469203816
 Transform:
   m_ObjectHideFlags: 0
@@ -2486,8 +2486,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beamPrefab: {fileID: 4680034347202167125, guid: 7af3e778cf9b6cf4c831da2b66c8b67d, type: 3}
-  muzzle: {fileID: 0}
   localForwardDirection: {x: 1, y: 0}
+  muzzle: {fileID: 0}
 --- !u!4 &1665060959
 Transform:
   m_ObjectHideFlags: 0
@@ -2529,14 +2529,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1829061367}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cbc52262d9aee784782ceabcb8576eee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   dropPrefab: {fileID: 4376865183755689267, guid: 34074cb65d2fc7d4ebacc111b0b132c3, type: 3}
-  muzzle: {fileID: 0}
   localForwardDirection: {x: 0, y: -1}
+  muzzle: {fileID: 0}
 --- !u!4 &1829061369
 Transform:
   m_ObjectHideFlags: 0

@@ -1029,14 +1029,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1053669312}
-  duration: 65
+  duration: 130
   playOnStart: 1
   tracks:
   - label: Fan 0-20
     enabled: 1
     emitterTemplate: {fileID: 1083625427}
     clips:
-    - label: Fan 0-20
+    - label: Fan1
       enabled: 1
       transition: 0
       attack:
@@ -1048,15 +1048,55 @@ MonoBehaviour:
         cooldown: 6
         landingPoints: []
       appearAt: 0
-      stopAt: 20
+      stopAt: 8
       position: {x: 6, y: 4, z: 0}
       rotationZ: -45
       entrySide: 0
       enterDuration: 1
       attackTimes:
       - 1
+      exitDuration: 1
+    - label: Fan 0-20 Copy
+      enabled: 1
+      transition: 0
+      attack:
+        bulletCount: 5
+        spreadAngle: 70
+        aimAtPlayer: 0
+        burstCount: 1
+        shotInterval: 0.5
+        cooldown: 6
+        landingPoints: []
+      appearAt: 8
+      stopAt: 14
+      position: {x: 6, y: 4, z: 0}
+      rotationZ: -45
+      entrySide: 0
+      enterDuration: 1
+      attackTimes:
       - 8
-      - 15
+      exitDuration: 1
+    - label: Fan 0-20 Copy
+      enabled: 1
+      transition: 0
+      attack:
+        bulletCount: 5
+        spreadAngle: 70
+        aimAtPlayer: 0
+        burstCount: 1
+        shotInterval: 0.5
+        cooldown: 6
+        landingPoints: []
+      appearAt: 20
+      stopAt: 40
+      position: {x: 6, y: 4, z: 0}
+      rotationZ: -45
+      entrySide: 0
+      enterDuration: 1
+      attackTimes:
+      - 21
+      - 28
+      - 35
       exitDuration: 1
   - label: Trace 10-60
     enabled: 1
@@ -1104,7 +1144,7 @@ MonoBehaviour:
         landingPoints: []
       appearAt: 22
       stopAt: 33
-      position: {x: 8.5, y: -2, z: 0}
+      position: {x: 8.3, y: -1.8, z: 0}
       rotationZ: 90
       entrySide: 0
       enterDuration: 1
@@ -1230,16 +1270,18 @@ MonoBehaviour:
         shotInterval: 0.5
         cooldown: 8
         landingPoints: []
-      appearAt: 40
-      stopAt: 60
+      appearAt: 0
+      stopAt: 130
       position: {x: 3, y: 4.3, z: 0}
       rotationZ: 0
       entrySide: 0
       enterDuration: 1
       attackTimes:
-      - 41
-      - 49
-      - 57
+      - 1
+      - 30
+      - 60
+      - 90
+      - 120
       exitDuration: 1
   sceneEmitters:
   - {fileID: 49424481}

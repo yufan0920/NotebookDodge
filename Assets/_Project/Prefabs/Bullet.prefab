@@ -138,10 +138,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   damage: 1
   useCharge: 1
-  unfoldDistance: 0.5
-  unfoldDuration: 0.2
-  holdDuration: 1
-  normalSpeed: 3
+  unfoldDistance: 1
+  unfoldDuration: 1
+  holdDuration: 2
+  normalSpeed: 5
   accelerationDuration: 0.3
   speedCurve:
     serializedVersion: 2

@@ -44,7 +44,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69a9d089154f3d745a5c30e3c0360a4c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  warningDuration: 1.2
+  warningDuration: 2
   warningWidth: 0.035
   warningColor: {r: 0.754717, g: 0.26820347, b: 0.16731933, a: 0.85}
   chargeDuration: 1.5

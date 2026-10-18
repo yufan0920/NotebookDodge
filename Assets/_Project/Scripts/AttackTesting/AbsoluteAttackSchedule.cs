@@ -13,8 +13,16 @@ public sealed class AbsoluteAttackSchedule
     private int next;
     public const float MaxFrameLateness = 0.1f;
     public AbsoluteAttackSchedule(List<float> starts, int burstCount, float interval)
+        : this(starts, burstCount, interval, float.NegativeInfinity, float.PositiveInfinity) { }
+
+    // Cold range tests omit earlier preparations without replaying or reporting them as missed.
+    // Filter AFTER expansion so surviving burst shots keep their original index (Impact targets).
+    public AbsoluteAttackSchedule(List<float> starts, int burstCount, float interval, float from, float to)
     {
+        if (float.IsNaN(from) || float.IsNaN(to) || from >= to)
+            throw new ArgumentException("Use an increasing range [from, to).");
         shots = Expand(starts, burstCount, interval);
+        shots.RemoveAll(shot => shot.time < from || shot.time >= to);
     }
     public static List<Shot> Expand(List<float> starts, int burstCount, float interval)
     {

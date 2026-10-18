@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-// Shared by the placement preview and future emitter orchestration.
+// Shared by the placement preview and emitter orchestration.
 // Positions and spacing are world XY units, including across different edges.
 public static class EmitterPointSelection
 {
@@ -34,7 +34,20 @@ public static class EmitterPointSelection
     {
         public readonly IReadOnlyList<Candidate> Points;
         public readonly float Spacing;
-        internal Reservation(IReadOnlyList<Candidate> points, float spacing) { Points = points; Spacing = spacing; }
+        private readonly List<Candidate> activePoints;
+        internal Reservation(IReadOnlyList<Candidate> points, float spacing)
+        {
+            activePoints = new List<Candidate>(points);
+            Points = activePoints.AsReadOnly();
+            Spacing = spacing;
+        }
+        internal bool RemovePoint(string id)
+        {
+            int index = activePoints.FindIndex(point => point.Id == id);
+            if (index < 0) return false;
+            activePoints.RemoveAt(index);
+            return true;
+        }
     }
 
     // Use one shared occupancy instance for all groups in a play session.
@@ -60,6 +73,17 @@ public static class EmitterPointSelection
         }
 
         public bool Release(Reservation reservation) => reservations.Remove(reservation);
+        // A group reserves atomically, but each emitter releases its own point after exit.
+        public bool ReleasePoint(Reservation reservation, string id)
+        {
+            if (reservation == null || !reservations.Contains(reservation) || !reservation.RemovePoint(id)) return false;
+            if (reservation.Points.Count == 0) reservations.Remove(reservation);
+            return true;
+        }
+        public int PointCount
+        {
+            get { int count = 0; foreach (var reservation in reservations) count += reservation.Points.Count; return count; }
+        }
         public void Clear() => reservations.Clear();
     }
 

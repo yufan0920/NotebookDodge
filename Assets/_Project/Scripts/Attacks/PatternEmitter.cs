@@ -1,10 +1,12 @@
 using UnityEngine;
 
-public class PatternEmitter : MonoBehaviour, ITimelineEmitter
+public class PatternEmitter : MonoBehaviour, ITimelineEmitter, IEmitterOrientation
 {
     [SerializeField] private PatternBullet bulletPrefab;
     [SerializeField, Tooltip("Fixed forward direction of the artwork before Rotation Z is applied.")]
     private Vector2 localForwardDirection = Vector2.down;
+    public Vector2 LocalForwardDirection => localForwardDirection.sqrMagnitude > 0.0001f
+        ? localForwardDirection.normalized : Vector2.down;
     private float readyAt;
     public bool IsBusy => Time.time < readyAt;
     public float PreparationDuration => bulletPrefab != null ? bulletPrefab.PreparationDuration : 0;
@@ -16,7 +18,7 @@ public class PatternEmitter : MonoBehaviour, ITimelineEmitter
         if (player == null || player.IsDead || bulletPrefab == null || bulletPrefab.gameObject.scene.IsValid() || IsBusy) return false;
         float spread = Mathf.Clamp(settings.spreadAngle, 0, 180);
         int count = Mathf.Max(1, settings.bulletCount);
-        Vector2 local = localForwardDirection.sqrMagnitude > 0.0001f ? localForwardDirection.normalized : Vector2.down;
+        Vector2 local = LocalForwardDirection;
         Vector2 center = ((Vector2)transform.TransformDirection(local)).normalized;
         for (int i = 0; i < count; i++)
         {

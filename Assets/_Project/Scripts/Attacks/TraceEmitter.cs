@@ -1,10 +1,12 @@
 using UnityEngine;
 
-public class TraceEmitter : MonoBehaviour, ITimelineEmitter
+public class TraceEmitter : MonoBehaviour, ITimelineEmitter, IEmitterOrientation
 {
     [SerializeField] private TraceBullet dropPrefab;
     [SerializeField, Tooltip("Fixed forward direction of the artwork before Rotation Z is applied.")]
     private Vector2 localForwardDirection = Vector2.down;
+    public Vector2 LocalForwardDirection => localForwardDirection.sqrMagnitude > 0.0001f
+        ? localForwardDirection.normalized : Vector2.down;
     [SerializeField] private Transform muzzle;
     private bool aimAtTarget;
     private TraceBullet preparingDrop, latestDrop;
@@ -38,8 +40,7 @@ public class TraceEmitter : MonoBehaviour, ITimelineEmitter
             Vector2 toTarget = lockedPosition - (Vector2)transform.position;
             if (toTarget.sqrMagnitude > 0.0001f)
             {
-                Vector2 local = localForwardDirection.sqrMagnitude > 0.0001f
-                    ? localForwardDirection.normalized : Vector2.down;
+                Vector2 local = LocalForwardDirection;
                 float targetAngle = Mathf.Atan2(toTarget.y, toTarget.x) * Mathf.Rad2Deg;
                 float localAngle = Mathf.Atan2(local.y, local.x) * Mathf.Rad2Deg;
                 transform.rotation = Quaternion.Euler(0, 0, targetAngle - localAngle);

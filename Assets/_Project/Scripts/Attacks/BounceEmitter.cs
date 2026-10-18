@@ -1,10 +1,12 @@
 using UnityEngine;
 
-public class BounceEmitter : MonoBehaviour, ITimelineEmitter
+public class BounceEmitter : MonoBehaviour, ITimelineEmitter, IEmitterOrientation
 {
     [SerializeField] private BounceBullet bulletPrefab;
     [SerializeField, Tooltip("Fixed forward direction of the artwork before Rotation Z is applied.")]
     private Vector2 localForwardDirection = Vector2.down;
+    public Vector2 LocalForwardDirection => localForwardDirection.sqrMagnitude > 0.0001f
+        ? localForwardDirection.normalized : Vector2.down;
     public bool IsBusy => false;
     public float PreparationDuration => 0;
     public bool CanFire => true;
@@ -14,7 +16,7 @@ public class BounceEmitter : MonoBehaviour, ITimelineEmitter
     {
         if (player == null || player.IsDead || bulletPrefab == null || bulletPrefab.gameObject.scene.IsValid()) return false;
         int count = Mathf.Max(1, settings.bulletCount);
-        Vector2 local = localForwardDirection.sqrMagnitude > 0.0001f ? localForwardDirection.normalized : Vector2.down;
+        Vector2 local = LocalForwardDirection;
         Vector2 center = ((Vector2)transform.TransformDirection(local)).normalized;
         if (settings.aimAtPlayer)
         {

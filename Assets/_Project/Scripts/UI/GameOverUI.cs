@@ -49,7 +49,7 @@ public class GameOverUI : MonoBehaviour
         // 结算只执行一次，防止重复显示或写入存档。
         if (resultShown) return;
         resultShown = true;
-        // 生存满一秒得一分：12.9 秒计为 12 分，和计时器显示一致。
+        // Score actual survival time, excluding the skipped part of a range test.
         int score = Mathf.Max(0, Mathf.FloorToInt(survivalTimer.ElapsedSeconds));
         int previousBest = Mathf.Max(0, PlayerPrefs.GetInt(BestScoreKey, 0));
         bool newRecord = score > previousBest;

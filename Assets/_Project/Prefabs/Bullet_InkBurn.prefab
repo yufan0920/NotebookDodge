@@ -125,7 +125,7 @@ MonoBehaviour:
     m_RotationOrder: 4
   minimumSpeedMultiplier: 0.5
   trackDuringWarning: 1
-  preLaunchDuration: 0.5
+  preLaunchDuration: 1
   trackingSmoothTime: 0.05
   warningColor: {r: 1, g: 0.1490196, b: 0.23469254, a: 0.5254902}
   warningWidth: 0.035

@@ -6,7 +6,7 @@ public static class AttackSettingsGUI
 {
     private static void Field(SerializedProperty settings, string name, string label)
         => EditorGUILayout.PropertyField(settings.FindPropertyRelative(name), new GUIContent(label), true);
-    public static void Draw(SerializedProperty settings, Object template, bool absoluteTimes = false)
+    public static void Draw(SerializedProperty settings, Object template, bool absoluteTimes = false, bool showHint = true)
     {
         if (template == null) { EditorGUILayout.HelpBox("Assign an emitter template first.", MessageType.Info); return; }
         if (template is PatternEmitter || template is BounceEmitter)
@@ -24,7 +24,7 @@ public static class AttackSettingsGUI
             : template is PatternEmitter ? "Cooldown starts after the volley finishes preparation."
             : template is TraceEmitter ? "Cooldown starts after the last shot in a burst. Tracking preparation pauses the next-shot timer."
             : "Cooldown is the interval between attacks.";
-        EditorGUILayout.HelpBox(hint, MessageType.None);
+        if (showHint) EditorGUILayout.HelpBox(hint, MessageType.None);
     }
     public static void Reset(SerializedProperty settings, Object template)
     {

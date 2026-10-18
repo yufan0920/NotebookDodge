@@ -7,3 +7,9 @@ public interface ITimelineEmitter
     bool CooldownAfterCompletion { get; }
     bool Fire(AttackSettings settings, PlayerHealth player, int shotIndex);
 }
+
+// Optional orientation contract for placement; projectile behavior stays in the emitter.
+public interface IEmitterOrientation
+{
+    UnityEngine.Vector2 LocalForwardDirection { get; }
+}

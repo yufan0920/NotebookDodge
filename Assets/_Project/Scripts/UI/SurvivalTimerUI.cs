@@ -7,6 +7,7 @@ public class SurvivalTimerUI : MonoBehaviour
 {
     [SerializeField] private PlayerHealth player;
     private TextMeshProUGUI label;
+    private AttackTimelineController timeline;
     public float ElapsedSeconds { get; private set; }
     private bool finished;
     private bool started;
@@ -23,6 +24,15 @@ public class SurvivalTimerUI : MonoBehaviour
             return;
         }
         // Start 时所有 Awake 已完成，玩家生命值已经初始化。
+        // Only use the controller belonging to this scene, not another additive scene.
+        foreach (var candidate in FindObjectsOfType<AttackTimelineController>())
+        {
+            if (candidate.isActiveAndEnabled && candidate.gameObject.scene == gameObject.scene)
+            {
+                timeline = candidate;
+                break;
+            }
+        }
         ElapsedSeconds = 0f;
         finished = player.IsDead;
         started = true;
@@ -37,6 +47,7 @@ public class SurvivalTimerUI : MonoBehaviour
         // 普通受伤、无敌期间仍然累计；死亡后永久停在本局成绩。
         if (player.IsDead)
         {
+            RefreshLabel();
             finished = true;
             return;
         }
@@ -47,12 +58,18 @@ public class SurvivalTimerUI : MonoBehaviour
     private void OnHealthChanged(int current, int maximum)
     {
         // 在扣血事件发生时立即停表，避免之后的 Update 再累计一帧。
-        if (current <= 0) finished = true;
+        if (current <= 0)
+        {
+            RefreshLabel();
+            finished = true;
+        }
     }
 
     private void RefreshLabel()
     {
-        int totalSeconds = Mathf.FloorToInt(ElapsedSeconds);
+        // The HUD follows absolute test time; scoring still uses actual survival time.
+        float displaySeconds = timeline != null && timeline.HasStarted ? timeline.Elapsed : ElapsedSeconds;
+        int totalSeconds = Mathf.FloorToInt(displaySeconds);
         if (totalSeconds == displayedSecond) return;
         displayedSecond = totalSeconds;
         int minutes = totalSeconds / 60;

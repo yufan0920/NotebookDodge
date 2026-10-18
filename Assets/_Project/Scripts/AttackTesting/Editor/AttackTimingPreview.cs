@@ -53,48 +53,36 @@ public static class AttackTimingPreview
         else hazard = Number(data, "lifetime", 0);
     }
 
-    public static void DrawTrackConflicts(SerializedProperty clips, Object template)
+    // Keep actionable warnings visible when the detailed timing preview is collapsed.
+    public static void DrawWarnings(SerializedProperty clip, Object template)
     {
         if (template == null) return;
-        var source = new SerializedObject(template);
-        var projectile = source.FindProperty("bulletPrefab")?.objectReferenceValue
-            ?? source.FindProperty("dropPrefab")?.objectReferenceValue
-            ?? source.FindProperty("beamPrefab")?.objectReferenceValue;
-        if (projectile == null) return;
-        float prepare, busy, hazard, tail;
-        var data = new SerializedObject(projectile);
-        GetTiming(template, data, out prepare, out busy, out hazard, out tail);
-        // Non-tracking Trace warnings still need the emitter to stay until launch.
-        float exitBusy = template is TraceEmitter ? Mathf.Max(0, Number(data, "preLaunchDuration")) : busy;
-        var ordered = new List<SerializedProperty>();
-        for (int i = 0; i < clips.arraySize; i++)
+        using (var source = new SerializedObject(template))
         {
-            var clip = clips.GetArrayElementAtIndex(i);
-            if (clip.FindPropertyRelative("enabled").boolValue) ordered.Add(clip);
-        }
-        ordered.Sort((a, b) => a.FindPropertyRelative("appearAt").floatValue.CompareTo(b.FindPropertyRelative("appearAt").floatValue));
-        float previousRelease = 0, previousExit = 0;
-        for (int c = 0; c < ordered.Count; c++)
-        {
-            var clip = ordered[c];
-            float at = clip.FindPropertyRelative("appearAt").floatValue;
-            bool move = clip.FindPropertyRelative("transition").enumValueIndex == 1;
-            float ready = Mathf.Max(at, previousRelease + (move ? 0 : previousExit)) + clip.FindPropertyRelative("enterDuration").floatValue;
-            var times = clip.FindPropertyRelative("attackTimes");
-            var settings = clip.FindPropertyRelative("attack");
-            int count = settings.FindPropertyRelative("burstCount").intValue;
-            if (count < 1 || (long)count * times.arraySize > 10000) continue;
-            float first = float.PositiveInfinity, last = float.NegativeInfinity;
-            for (int i = 0; i < times.arraySize; i++)
+            Object projectile = source.FindProperty("bulletPrefab")?.objectReferenceValue
+                ?? source.FindProperty("dropPrefab")?.objectReferenceValue
+                ?? source.FindProperty("beamPrefab")?.objectReferenceValue;
+            if (projectile == null)
             {
-                float start = times.GetArrayElementAtIndex(i).floatValue;
-                first = Mathf.Min(first, start);
-                last = Mathf.Max(last, start + (count - 1) * settings.FindPropertyRelative("shotInterval").floatValue);
+                EditorGUILayout.HelpBox("Assign the projectile prefab on the emitter.", MessageType.Warning);
+                return;
             }
-            if (c > 0 && first < ready - 0.0001f)
-                EditorGUILayout.HelpBox(clip.FindPropertyRelative("label").stringValue + $": first attack at {first:F2}s is before estimated arrival {ready:F2}s. Allow time for the previous attack and exit, use Move, or use a separate track.", MessageType.Warning);
-            previousRelease = Mathf.Max(clip.FindPropertyRelative("stopAt").floatValue, last + exitBusy);
-            previousExit = clip.FindPropertyRelative("exitDuration").floatValue;
+            var starts = new List<float>();
+            foreach (SerializedProperty time in clip.FindPropertyRelative("attackTimes")) starts.Add(time.floatValue);
+            var attack = clip.FindPropertyRelative("attack");
+            int count = attack.FindPropertyRelative("burstCount").intValue;
+            if (count < 1 || (long)count * starts.Count > 10000) return;
+            using (var data = new SerializedObject(projectile))
+            {
+                GetTiming(template, data, out _, out float busy, out _, out _);
+                var shots = AbsoluteAttackSchedule.Expand(starts, count, attack.FindPropertyRelative("shotInterval").floatValue);
+                for (int i = 1; i < shots.Count; i++)
+                    if (shots[i].time - shots[i - 1].time < busy - 0.0001f)
+                    {
+                        EditorGUILayout.HelpBox("Possible timing conflict: an earlier attack may still be active. Increase attack spacing or use another track. Busy shots are skipped.", MessageType.Warning);
+                        return;
+                    }
+            }
         }
     }
     public static void Draw(SerializedProperty clip, Object template)

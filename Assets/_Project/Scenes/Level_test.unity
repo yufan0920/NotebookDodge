@@ -1072,7 +1072,7 @@ MonoBehaviour:
       cooldown: 8
       landingPoints: []
     appearAt: 43
-    stopAt: 60
+    stopAt: 154
     position: {x: -5.49, y: 4.58, z: -0.08644457}
     rotationZ: 0
     entrySide: 0
@@ -1081,6 +1081,15 @@ MonoBehaviour:
     - 44
     - 49
     - 54
+    - 60
+    - 71
+    - 82
+    - 93
+    - 104
+    - 115
+    - 126
+    - 137
+    - 148
     exitDuration: 1
     emitterTemplate: {fileID: 49424482}
   - label: Laser1-1 (right to left)
@@ -1316,6 +1325,9 @@ MonoBehaviour:
     attackTimes:
     - 42
     - 72
+    - 102
+    - 132
+    - 162
     exitDuration: 1
     emitterTemplate: {fileID: 121472946}
   - label: Fan2
@@ -1370,6 +1382,324 @@ MonoBehaviour:
     - 13
     exitDuration: 0.5
     emitterTemplate: {fileID: 1083625427}
+  - label: Fan4-1
+    enabled: 1
+    placementMode: 1
+    pointId: Top_02
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    attack:
+      bulletCount: 5
+      spreadAngle: 70
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 63
+    stopAt: 88
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 64
+    - 74
+    - 84
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1083625427}
+  - label: Fan4-2
+    enabled: 1
+    placementMode: 1
+    pointId: Top_18
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    attack:
+      bulletCount: 5
+      spreadAngle: 70
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 63
+    stopAt: 88
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 64
+    - 74
+    - 84
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1083625427}
+  - label: Laser4-1
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 90
+    stopAt: 99
+    position: {x: -9.5, y: 0, z: 0}
+    rotationZ: -90
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 91
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser5-1
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 100
+    stopAt: 110
+    position: {x: -8.5, y: -2, z: 0}
+    rotationZ: -40
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 101
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser5-2
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 101
+    stopAt: 110
+    position: {x: -6.5, y: -4.5, z: 0}
+    rotationZ: -40
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 102
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser5-3
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 102
+    stopAt: 110
+    position: {x: -3, y: -5, z: 0}
+    rotationZ: -40
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 103
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser5-4
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 103
+    stopAt: 110
+    position: {x: 0.5, y: -5, z: 0}
+    rotationZ: -40
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 104
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser4-2
+    enabled: 1
+    placementMode: 1
+    pointId: Bottom_10
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 90
+    stopAt: 99
+    position: {x: 8.5, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 91
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Fan5
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 2
+    region: 0
+    minSpacing: 5
+    randomSeed: -1944696542
+    attack:
+      bulletCount: 4
+      spreadAngle: 50
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 118
+    stopAt: 130
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 119
+    - 126
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1083625427}
+  - label: Fan5-2
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 5
+    randomSeed: -1217163175
+    attack:
+      bulletCount: 4
+      spreadAngle: 50
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 140
+    stopAt: 151
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 141
+    - 148
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1083625427}
+  - label: Laser6
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 4
+    randomSeed: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 113
+    stopAt: 121
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 114
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser6-2
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 4
+    randomSeed: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      landingPoints: []
+    appearAt: 135
+    stopAt: 143
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 136
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
   player: {fileID: 1053669312}
   pointLibrary: {fileID: 1913563562}
   minEmitterSpacing: 2

@@ -164,7 +164,7 @@ public static class AttackTimingPreview
         }
         if (shots.Count > 12) EditorGUILayout.LabelField($"... {shots.Count} shots total. Copy for the full list.");
         if (collision) EditorGUILayout.HelpBox("Possible timing conflict: an earlier attack may still be preparing or active. Increase spacing or use a separate emitter track. Runtime skips busy shots and logs them.", MessageType.Warning);
-        EditorGUILayout.HelpBox("Stage estimates have frame / physics-step tolerance. Hits and tracking can end hazards early or change impact time. Loop end clears all remaining attacks.", MessageType.None);
+        EditorGUILayout.HelpBox("Stage estimates have frame / physics-step tolerance. Hits and tracking can end hazards early or change impact time. Game / range-test end clears remaining attacks; endless repeat boundaries do not.", MessageType.None);
         if (GUILayout.Button("Copy Timing Preview (Excel)")) EditorGUIUtility.systemCopyBuffer = text.ToString();
     }
 }

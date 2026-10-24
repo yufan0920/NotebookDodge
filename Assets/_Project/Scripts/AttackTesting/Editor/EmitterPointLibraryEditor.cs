@@ -1,4 +1,3 @@
-#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -12,6 +11,15 @@ public class EmitterPointLibraryEditor : Editor
     private bool showGeneration;
     private string generationError;
     private static GUIStyle pointLabel;
+    private bool editPoints = true;
+    private bool hidTools, previousToolsHidden;
+    private bool showSideAdjustment;
+    private EmitterPointLibrary.Side adjustSide = EmitterPointLibrary.Side.Bottom;
+    private Vector2 sideOffset = new Vector2(0, -0.3f);
+    private PlayerMovementArea movementArea;
+    private float edgeGap = 0.5f;
+    private float edgeInset = 0.3f;
+    private string adjustmentError;
     private bool showRandom = true;
     private int previewCount = 3, previewSeed = 1;
     private float previewSpacing = 2;
@@ -28,6 +36,7 @@ public class EmitterPointLibraryEditor : Editor
 
     private void OnDisable()
     {
+        RestoreTools();
         Undo.undoRedoPerformed -= Refresh;
         ClearRandomPreview();
         SceneView.RepaintAll();
@@ -61,15 +70,18 @@ public class EmitterPointLibraryEditor : Editor
         serializedObject.Update();
         using (new EditorGUI.DisabledScope(true))
             EditorGUILayout.PropertyField(serializedObject.FindProperty("m_Script"));
-        EditorGUILayout.HelpBox("Click a point in Scene view. Drag its center to move it; drag the arrow tip to aim. Arrows show the final firing direction. Changes support Undo (Ctrl+Z).", MessageType.Info);
+        EditorGUILayout.HelpBox("Select this library in Hierarchy, then enable Edit Points. Click a point and drag its yellow center; drag the arrow tip to aim. You can also edit Position (World XY) below. Ctrl+Z undoes changes.", MessageType.Info);
 
         using (new EditorGUI.DisabledScope(EditorApplication.isPlayingOrWillChangePlaymode))
         {
+            editPoints = EditorGUILayout.Toggle("Edit Points in Scene", editPoints);
+            UpdateTools();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("previewRegion"), new GUIContent("Preview Region"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("showLabels"), new GUIContent("Show Point IDs"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("arrowLength"), new GUIContent("Arrow Display Length"));
             Apply();
             DrawPointSelection();
+            DrawSideAdjustment();
             DrawRandomPlacement();
 
             EditorGUILayout.Space();
@@ -119,7 +131,7 @@ public class EmitterPointLibraryEditor : Editor
                     if (GUILayout.Button("Save as Library Prefab...")) SavePrefab();
             }
             else if (PrefabUtility.IsPartOfPrefabInstance(Library))
-                EditorGUILayout.HelpBox("This is a prefab instance. Use Overrides > Apply All to share point edits with other scenes.", MessageType.None);
+                EditorGUILayout.HelpBox("Point edits are local prefab overrides. Apply to the prefab only if other scenes should share this layout.", MessageType.None);
         }
         if (Vector3.Dot(Library.transform.forward, Vector3.forward) < 0.999f)
             EditorGUILayout.HelpBox("Use a 2D XY layout: keep Rotation X and Y at zero.", MessageType.Warning);
@@ -135,6 +147,94 @@ public class EmitterPointLibraryEditor : Editor
             randomError = null;
             SceneView.RepaintAll();
         }
+    }
+
+    private void UpdateTools()
+    {
+        bool editing = editPoints && !EditorApplication.isPlayingOrWillChangePlaymode &&
+            !EditorUtility.IsPersistent(Library) && Selection.activeGameObject == Library.gameObject;
+        if (editing && !hidTools)
+        {
+            previousToolsHidden = Tools.hidden;
+            Tools.hidden = true;
+            hidTools = true;
+        }
+        else if (!editing) RestoreTools();
+    }
+
+    private void RestoreTools()
+    {
+        if (!hidTools) return;
+        Tools.hidden = previousToolsHidden;
+        hidTools = false;
+    }
+
+    private void DrawSideAdjustment()
+    {
+        showSideAdjustment = EditorGUILayout.Foldout(showSideAdjustment, "Adjust One Side", true);
+        if (!showSideAdjustment) return;
+        adjustSide = (EmitterPointLibrary.Side)EditorGUILayout.EnumPopup("Side", adjustSide);
+        sideOffset = EditorGUILayout.Vector2Field("Move Offset (World XY)", sideOffset);
+        if (GUILayout.Button("Move Side")) AdjustSide(false);
+        movementArea = (PlayerMovementArea)EditorGUILayout.ObjectField("Movement Area", movementArea,
+            typeof(PlayerMovementArea), true);
+        edgeGap = Mathf.Max(0, EditorGUILayout.FloatField("Gap Outside Edge", edgeGap));
+        edgeInset = Mathf.Max(0, EditorGUILayout.FloatField("Corner Inset", edgeInset));
+        if (GUILayout.Button("Align Side to Movement Area")) AdjustSide(true);
+        EditorGUILayout.HelpBox("Move Side adds the offset once. Align Side spaces the existing points along the selected boundary edge. IDs, directions and other sides are preserved. Ctrl+Z to undo.", MessageType.None);
+        if (adjustmentError != null) EditorGUILayout.HelpBox(adjustmentError, MessageType.Warning);
+    }
+
+    private void AdjustSide(bool align)
+    {
+        adjustmentError = null;
+        var indices = new List<int>();
+        for (int i = 0; i < Library.Points.Count; i++)
+            if (Library.Points[i].EntrySide == adjustSide) indices.Add(i);
+        if (indices.Count == 0) { adjustmentError = "No points on this side."; return; }
+        if (!IsFinite(sideOffset.x) || !IsFinite(sideOffset.y) || !IsFinite(edgeGap) || !IsFinite(edgeInset))
+        { adjustmentError = "Use finite offsets and distances."; return; }
+
+        Vector2 start = default, end = default;
+        if (align)
+        {
+            var corners = new Vector2[4];
+            if (movementArea == null || movementArea.gameObject.scene != Library.gameObject.scene ||
+                !movementArea.TryCopyBoundary(corners))
+            { adjustmentError = "Assign a valid Movement Area from this scene."; return; }
+            switch (adjustSide)
+            {
+                case EmitterPointLibrary.Side.Top: start = corners[3]; end = corners[2]; break;
+                case EmitterPointLibrary.Side.Bottom: start = corners[0]; end = corners[1]; break;
+                case EmitterPointLibrary.Side.Left: start = corners[0]; end = corners[3]; break;
+                default: start = corners[1]; end = corners[2]; break;
+            }
+            Vector2 tangent = (end - start).normalized;
+            if (edgeInset * 2 >= Vector2.Distance(start, end))
+            { adjustmentError = "Corner Inset must be less than half the edge length."; return; }
+            Vector2 normal = new Vector2(-tangent.y, tangent.x);
+            Vector2 center = (corners[0] + corners[1] + corners[2] + corners[3]) / 4;
+            if (Vector2.Dot(normal, (start + end) / 2 - center) < 0) normal = -normal;
+            start += tangent * edgeInset + normal * edgeGap;
+            end += -tangent * edgeInset + normal * edgeGap;
+            // IDs retain the authored order: horizontal left-to-right, vertical bottom-to-top.
+            indices.Sort((a, b) => string.CompareOrdinal(Library.Points[a].Id, Library.Points[b].Id));
+        }
+        serializedObject.Update();
+        var points = serializedObject.FindProperty("points");
+        for (int n = 0; n < indices.Count; n++)
+        {
+            int index = indices[n];
+            Vector3 world = Library.GetWorldPosition(Library.Points[index]);
+            Vector2 next = align ? Vector2.Lerp(start, end, indices.Count == 1 ? 0.5f : (float)n / (indices.Count - 1))
+                : (Vector2)world + sideOffset;
+            world.x = next.x; world.y = next.y;
+            points.GetArrayElementAtIndex(index).FindPropertyRelative("position").vector2Value =
+                Library.transform.InverseTransformPoint(world);
+        }
+        Apply();
+        ClearRandomPreview();
+        SceneView.RepaintAll();
     }
 
     private void DrawRandomPlacement()
@@ -340,7 +440,11 @@ public class EmitterPointLibraryEditor : Editor
 
     private void OnSceneGUI()
     {
-        if (EditorApplication.isPlayingOrWillChangePlaymode || Library.Points.Count == 0) return;
+        UpdateTools();
+        if (!editPoints || EditorApplication.isPlayingOrWillChangePlaymode || Library.Points.Count == 0) return;
+        // Background sprites must not steal clicks while editing points.
+        if (!Event.current.alt)
+            HandleUtility.AddDefaultControl(GUIUtility.GetControlID(FocusType.Passive));
         selectedIndex = Mathf.Clamp(selectedIndex, 0, Library.Points.Count - 1);
         Color oldColor = Handles.color;
         if (randomPreview != null)
@@ -380,7 +484,7 @@ public class EmitterPointLibraryEditor : Editor
             Handles.color = Color.yellow;
             EditorGUI.BeginChangeCheck();
             Vector3 moved = Handles.Slider2D(position, Library.transform.forward,
-                Library.transform.right, Library.transform.up, size, Handles.CircleHandleCap, Vector2.zero);
+                Library.transform.right, Library.transform.up, size, Handles.DotHandleCap, Vector2.zero);
             if (EditorGUI.EndChangeCheck()) SetPosition(moved);
 
             Vector3 tip = moved + (Vector3)Library.GetWorldDirection(selected) * Library.ArrowLength;
@@ -436,4 +540,3 @@ public class EmitterPointLibraryEditor : Editor
         }
     }
 }
-#endif

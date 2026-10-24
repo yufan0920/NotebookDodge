@@ -206,11 +206,24 @@ public class AttackTimelineWindow : EditorWindow
                 EditorGUILayout.LabelField("Global " + GlobalLabel(controller.Elapsed), GUILayout.MinWidth(145));
                 using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
                 {
-                    EditorGUILayout.LabelField("Duration (s)", GUILayout.Width(78));
+                    EditorGUILayout.LabelField(new GUIContent("Duration (s)", "End of the authored pattern. With Endless P3 enabled, playback continues beyond this time."), GUILayout.Width(78));
                     EditorGUILayout.PropertyField(data.FindProperty("duration"), GUIContent.none);
                 }
             }
             DrawTimeView(data, controller.Elapsed);
+            using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+            {
+                EditorGUILayout.PropertyField(data.FindProperty("endlessPhase3"), new GUIContent("Endless P3"));
+                if (data.FindProperty("endlessPhase3").boolValue)
+                {
+                    EditorGUILayout.PropertyField(data.FindProperty("loopFrom"), new GUIContent("Loop From (global s)",
+                        "Repeat attacks starting here through Duration. Teaching before this time plays only once."));
+                    float start = data.FindProperty("loopFrom").floatValue;
+                    string loopError = EndlessAttackLoop.Validate(start, fullDuration, phase3Start);
+                    EditorGUILayout.HelpBox(loopError ?? $"Repeat {start:0.##}-{fullDuration:0.##}s every {fullDuration - start:0.##}s. Total time keeps increasing; hazards are not cleared. Play Range remains a finite test.",
+                        loopError == null ? MessageType.None : MessageType.Warning);
+                }
+            }
             DrawRangeTest(controller);
             setupOpen = EditorGUILayout.Foldout(setupOpen, "Scene Setup", true);
             if (setupOpen)

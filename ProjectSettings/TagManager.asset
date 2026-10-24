@@ -41,9 +41,15 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Background
+    uniqueID: 3076207073
+    locked: 0
   - name: Bullet
     uniqueID: 660470099
     locked: 0
   - name: Emitter
     uniqueID: 1853910331
+    locked: 0
+  - name: Player
+    uniqueID: 2910473157
     locked: 0

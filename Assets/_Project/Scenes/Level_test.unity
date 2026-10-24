@@ -984,6 +984,7 @@ GameObject:
   - component: {fileID: 908978423}
   - component: {fileID: 908978424}
   - component: {fileID: 908978425}
+  - component: {fileID: 908978426}
   m_Layer: 5
   m_Name: HealthBar
   m_TagString: Untagged
@@ -1011,7 +1012,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
   m_AnchoredPosition: {x: 30, y: -30}
-  m_SizeDelta: {x: 300, y: 24}
+  m_SizeDelta: {x: 392, y: 72}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &908978424
 MonoBehaviour:
@@ -1022,46 +1023,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 908978422}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 67db9e8f0e2ae9c40bc1e2b64352a6b4, type: 3}
+  m_Script: {fileID: 11500000, guid: 8c7b7c840d9140b6a6f6a219e56cfca4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Navigation:
-    m_Mode: 0
-    m_WrapAround: 0
-    m_SelectOnUp: {fileID: 0}
-    m_SelectOnDown: {fileID: 0}
-    m_SelectOnLeft: {fileID: 0}
-    m_SelectOnRight: {fileID: 0}
-  m_Transition: 0
-  m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
-    m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
-    m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
-    m_DisabledColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 0.5019608}
-    m_ColorMultiplier: 1
-    m_FadeDuration: 0.1
-  m_SpriteState:
-    m_HighlightedSprite: {fileID: 0}
-    m_PressedSprite: {fileID: 0}
-    m_SelectedSprite: {fileID: 0}
-    m_DisabledSprite: {fileID: 0}
-  m_AnimationTriggers:
-    m_NormalTrigger: Normal
-    m_HighlightedTrigger: Highlighted
-    m_PressedTrigger: Pressed
-    m_SelectedTrigger: Selected
-    m_DisabledTrigger: Disabled
-  m_Interactable: 0
-  m_TargetGraphic: {fileID: 0}
-  m_FillRect: {fileID: 330481887}
-  m_HandleRect: {fileID: 0}
-  m_Direction: 0
-  m_MinValue: 0
-  m_MaxValue: 5
-  m_WholeNumbers: 1
-  m_Value: 0
-  m_OnValueChanged:
+  m_Material: {fileID: 0}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_RaycastTarget: 0
+  m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
+  m_Maskable: 1
+  m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
 --- !u!114 &908978425
@@ -1077,6 +1047,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 1053669312}
+  iconSprite: {fileID: 0}
+  heartSize: 32
+  spacing: 8
+  heartsPerRow: 10
+  filledColor: {r: 0.95, g: 0.22, b: 0.32, a: 1}
+  outlineColor: {r: 0.22, g: 0.12, b: 0.17, a: 1}
+  emptyColor: {r: 0.48, g: 0.48, b: 0.53, a: 1}
+--- !u!222 &908978426
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 908978422}
+  m_CullTransparentMesh: 1
 --- !u!1 &910000001
 GameObject:
   m_ObjectHideFlags: 0
@@ -1433,7 +1418,7 @@ MonoBehaviour:
     - 36
     exitDuration: 1
     emitterTemplate: {fileID: 1469203815}
-  - label: Bounce
+  - label: "Bounce\uFF08\u4E2D-\u524D70\u79D2 \u540E80\u79D2\uFF09"
     enabled: 1
     placementMode: 2
     pointId: 
@@ -1454,7 +1439,7 @@ MonoBehaviour:
       landingPoints: []
       landingPointObjects: []
     appearAt: 4
-    stopAt: 520
+    stopAt: 530
     position: {x: 3, y: 4.3, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -1462,13 +1447,50 @@ MonoBehaviour:
     attackTimes:
     - 5
     - 75
-    - 135
-    - 195
-    - 255
-    - 345
-    - 375
+    - 145
+    - 215
+    - 285
+    - 355
     - 435
-    - 495
+    - 515
+    exitDuration: 1
+    emitterTemplate: {fileID: 121472946}
+  - label: "Bounce\uFF08\u96BE-\u524D60\u79D2 \u540E80\u79D2\uFF09 Copy"
+    enabled: 0
+    placementMode: 2
+    pointId: 
+    emitterCount: 1
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 0
+      aimAtPlayer: 1
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 8
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 4
+    stopAt: 530
+    position: {x: 3, y: 4.3, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 1
+    attackTimes:
+    - 5
+    - 65
+    - 125
+    - 185
+    - 245
+    - 285
+    - 305
+    - 385
+    - 465
     exitDuration: 1
     emitterTemplate: {fileID: 121472946}
   - label: Fan2
@@ -1981,18 +2003,18 @@ MonoBehaviour:
       landingPointSource: 0
       landingPoints: []
       landingPointObjects: []
-    appearAt: 378
+    appearAt: 382
     stopAt: 520
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
     enterDuration: 0.5
     attackTimes:
-    - 380
-    - 410
-    - 440
-    - 470
-    - 500
+    - 383
+    - 413
+    - 443
+    - 473
+    - 503
     exitDuration: 0.5
     emitterTemplate: {fileID: 1829061368}
   - label: Trace2
@@ -2614,7 +2636,7 @@ MonoBehaviour:
     - 348
     exitDuration: 0.5
     emitterTemplate: {fileID: 49424482}
-  - label: Impact1
+  - label: "Impact1\u6559\u5B66"
     enabled: 1
     placementMode: 0
     pointId: 
@@ -2628,7 +2650,7 @@ MonoBehaviour:
       spreadAngle: 40
       aimAtPlayer: 0
       burstCount: 4
-      shotInterval: 3
+      shotInterval: 2
       cooldown: 2
       groundLifetime: 0
       landingPointSource: 1
@@ -2640,7 +2662,7 @@ MonoBehaviour:
       - {fileID: 623882957}
       - {fileID: 744891627}
     appearAt: 354
-    stopAt: 378
+    stopAt: 382
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -2777,7 +2799,7 @@ MonoBehaviour:
       - {fileID: 1618438630}
       - {fileID: 744891627}
     appearAt: 490
-    stopAt: 500
+    stopAt: 502
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -2838,7 +2860,7 @@ MonoBehaviour:
       landingPoints: []
       landingPointObjects: []
     appearAt: 385
-    stopAt: 475
+    stopAt: 530
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -2848,6 +2870,8 @@ MonoBehaviour:
     - 414
     - 442
     - 470
+    - 498
+    - 526
     exitDuration: 0.5
     emitterTemplate: {fileID: 1083625427}
   - label: Fan8
@@ -2857,7 +2881,7 @@ MonoBehaviour:
     emitterCount: 2
     region: 1
     minSpacing: 2
-    randomSeed: -1917334505
+    randomSeed: -591801197
     reenterPerAttack: 1
     attack:
       bulletCount: 5
@@ -2871,7 +2895,7 @@ MonoBehaviour:
       landingPoints: []
       landingPointObjects: []
     appearAt: 385
-    stopAt: 489
+    stopAt: 516
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -2881,6 +2905,7 @@ MonoBehaviour:
     - 428
     - 456
     - 484
+    - 512
     exitDuration: 0.5
     emitterTemplate: {fileID: 1083625427}
   - label: Laser10
@@ -2904,22 +2929,24 @@ MonoBehaviour:
       landingPoints: []
       landingPointObjects: []
     appearAt: 450
-    stopAt: 520
+    stopAt: 533
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
     enterDuration: 0.5
     attackTimes:
     - 451
-    - 481
-    - 511
+    - 470
+    - 489
+    - 508
+    - 527
     exitDuration: 0.5
     emitterTemplate: {fileID: 1469203815}
   - label: Trace5
     enabled: 1
     placementMode: 2
     pointId: Left_01
-    emitterCount: 3
+    emitterCount: 1
     region: 1
     minSpacing: 2
     randomSeed: 1
@@ -2928,7 +2955,7 @@ MonoBehaviour:
       bulletCount: 1
       spreadAngle: 40
       aimAtPlayer: 1
-      burstCount: 1
+      burstCount: 4
       shotInterval: 0.5
       cooldown: 2
       groundLifetime: 0
@@ -2974,21 +3001,23 @@ MonoBehaviour:
     entrySide: 0
     enterDuration: 0.5
     attackTimes:
-    - 390
-    - 410
-    - 430
-    - 450
-    - 470
-    - 490
-    - 510
+    - 389
+    - 409
+    - 429
+    - 449
+    - 469
+    - 489
+    - 509
     exitDuration: 0.5
     emitterTemplate: {fileID: 510946650}
   player: {fileID: 1053669312}
   pointLibrary: {fileID: 1913563562}
   minEmitterSpacing: 2
-  duration: 521
+  duration: 533
   phase2Start: 155
   phase3Start: 354
+  endlessPhase3: 1
+  loopFrom: 382
   playOnStart: 1
   tracks: []
   sceneEmitters:
@@ -3332,7 +3361,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe8d2bebc12858a43b14df9248bc6edf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 50
+  maxHealth: 20
   invincibilityDuration: 0.8
   redFlashDuration: 0.2
   hitColor: {r: 1, g: 0.3, b: 0.3, a: 1}
@@ -3539,7 +3568,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1157608142
 RectTransform:
   m_ObjectHideFlags: 0
@@ -4578,7 +4607,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1988300372
 RectTransform:
   m_ObjectHideFlags: 0

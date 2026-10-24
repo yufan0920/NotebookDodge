@@ -41,7 +41,7 @@ public class EmitterTestWindow : EditorWindow
         {
             if (component == null || !component.gameObject.scene.IsValid() ||
                 !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is TraceEmitter || component is PatternEmitter || component is BounceEmitter || component is LaserEmitter || component is ImpactEmitter)
+            if (component is ITimelineEmitter)
                 emitters.Add(component);
         }
         emitters.Sort((a, b) => string.CompareOrdinal(GetPath(a.transform), GetPath(b.transform)));
@@ -139,16 +139,5 @@ public class EmitterTestWindow : EditorWindow
         }
     }
 
-    private static void ClearProjectiles()
-    {
-        if (!EditorApplication.isPlaying) return;
-        // 仅清理场景中的子弹；TraceBullet.OnDestroy 会同时清理自己的预警和材质。
-        foreach (MonoBehaviour component in Resources.FindObjectsOfTypeAll<MonoBehaviour>())
-        {
-            if (component == null || !component.gameObject.scene.IsValid() ||
-                !component.gameObject.scene.isLoaded || EditorUtility.IsPersistent(component)) continue;
-            if (component is Bullet || component is TraceBullet || component is PatternBullet || component is BounceBullet || component is LaserBeam || component is GroundArea || component is ImpactBullet)
-                Object.Destroy(component.gameObject);
-        }
-    }
+    private static void ClearProjectiles() => AttackCleanup.Clear(deactivate: false);
 }

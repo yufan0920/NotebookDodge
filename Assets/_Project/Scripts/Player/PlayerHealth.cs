@@ -78,7 +78,7 @@ public class PlayerHealth : MonoBehaviour
 
     private bool ApplyDamage(int amount, bool groundDamage)
     {
-        // 无敌期间忽略新伤害；Bullet 仍会按原来的逻辑销毁。
+        // 无敌期间忽略新伤害；子弹是否消失由各自的攻击脚本决定。
         if (IsDead || IsInvincible || amount <= 0) return false;
         // 先开启保护，保证同一物理步里多颗子弹命中也只扣一次。
         if (!groundDamage) invincibleUntil = Time.time + invincibilityDuration;

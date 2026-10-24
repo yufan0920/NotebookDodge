@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-//保存数量、夹角、连射等参数。文件中还包含 Prototype 使用的循环调度逻辑
+// Shared attack parameters used by level tracks and single-emitter tests.
 [Serializable]
 public class AttackSettings
 {
@@ -73,35 +73,5 @@ public class AttackSettings
         copy.landingPoints = landingPoints == null ? new Vector2[0] : (Vector2[])landingPoints.Clone();
         copy.landingPointObjects = landingPointObjects == null ? new Transform[0] : (Transform[])landingPointObjects.Clone();
         return copy;
-    }
-}
-
-// Shared scheduling for timeline clips and the independent test driver.
-public sealed class AttackSequence
-{
-    private float remaining;
-    private int shotsInBurst, shotIndex;
-    private bool waitingForCompletion;
-    public bool Failed { get; private set; }
-    public AttackSequence(float delay = 0) { remaining = Mathf.Max(0, delay); }
-    public void Tick(float deltaTime, ITimelineEmitter emitter, AttackSettings settings, PlayerHealth player)
-    {
-        if (Failed || !emitter.CanFire) return;
-        if (waitingForCompletion)
-        {
-            if (emitter.IsBusy) return;
-            waitingForCompletion = false;
-            remaining = Mathf.Max(0.05f, settings.cooldown);
-        }
-        remaining -= deltaTime;
-        if (remaining > 0) return;
-        if (!emitter.Fire(settings, player, shotIndex)) { Failed = true; return; }
-        shotIndex++;
-        shotsInBurst++;
-        bool burstFinished = shotsInBurst >= Mathf.Max(1, settings.burstCount);
-        if (burstFinished) shotsInBurst = 0;
-        waitingForCompletion = burstFinished && emitter.CooldownAfterCompletion;
-        remaining = emitter.PreparationDuration + Mathf.Max(0.05f,
-            burstFinished ? settings.cooldown : settings.shotInterval);
     }
 }

@@ -116,6 +116,8 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
     // Editor time-view boundaries only. Scheduling always uses the original global seconds.
     [SerializeField, Min(0)] private float phase2Start = 155;
     [SerializeField, Min(0)] private float phase3Start = 355;
+    [SerializeField] private bool endlessPhase3;
+    [SerializeField, Min(0)] private float loopFrom = 382;
     [SerializeField] private bool playOnStart = true;
     [SerializeField, HideInInspector] private List<Track> tracks = new List<Track>();
     [SerializeField] private List<GameObject> sceneEmitters = new List<GameObject>();
@@ -157,6 +159,13 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
     public EmitterPointLibrary PointLibrary => pointLibrary;
     public int ReservedPointCount => pointOccupancy.PointCount;
     private bool initialized, ending;
+    private bool sessionEndless;
+    private float sessionLoopFrom, sessionLoopEnd, repeatLookahead;
+    private int scheduledRepeat;
+    private readonly Dictionary<EmitterTrack, ReentryCycle> trackCycles = new Dictionary<EmitterTrack, ReentryCycle>();
+    public bool IsEndless => sessionEndless;
+    public float PatternTime => sessionEndless ? EndlessAttackLoop.PatternTime(Elapsed, sessionLoopFrom, sessionLoopEnd) : Elapsed;
+    public int RepeatNumber => sessionEndless ? EndlessAttackLoop.RepeatNumber(Elapsed, sessionLoopFrom, sessionLoopEnd) : 0;
     public readonly List<string> AttackLog = new List<string>();
     public float Elapsed { get; private set; }
     public bool HasStarted => initialized;
@@ -215,32 +224,80 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
     public static float WaveEntryTime(Cue cue, float attackTime, int waveIndex)
         => waveIndex == 0 ? cue.appearAt : attackTime - cue.enterDuration;
 
-    private void AddRunningTrack(EmitterTrack track, float from, bool rangeTest)
+    private void AddRunningTrack(EmitterTrack track, float from, bool rangeTest, int repeat = 0)
     {
-        var bursts = track.reenterPerAttack
-            ? AbsoluteAttackSchedule.ExpandBursts(track.attackTimes, track.attack.burstCount, track.attack.shotInterval)
-            : new List<List<AbsoluteAttackSchedule.Shot>> { null };
-        var cycle = track.reenterPerAttack ? new ReentryCycle() : null;
+        float shift = repeat == 0 ? 0 : repeat * (sessionLoopEnd - sessionLoopFrom);
+        var originalBursts = AbsoluteAttackSchedule.ExpandBursts(track.attackTimes, track.attack.burstCount, track.attack.shotInterval);
+        var bursts = repeat == 0 ? originalBursts : EndlessAttackLoop.RepeatBursts(
+            track.attackTimes, track.attack.burstCount, track.attack.shotInterval, sessionLoopFrom, sessionLoopEnd, repeat);
+        if (bursts.Count == 0) return;
+        if (!track.reenterPerAttack)
+        {
+            if (repeat == 0) bursts = new List<List<AbsoluteAttackSchedule.Shot>> { null };
+            else
+            {
+                var combined = new List<AbsoluteAttackSchedule.Shot>();
+                foreach (var burst in bursts) combined.AddRange(burst);
+                combined.Sort((a, b) => a.time.CompareTo(b.time));
+                bursts = new List<List<AbsoluteAttackSchedule.Shot>> { combined };
+            }
+        }
+        ReentryCycle cycle = null;
+        if (track.reenterPerAttack && !trackCycles.TryGetValue(track, out cycle))
+        { cycle = new ReentryCycle(); trackCycles.Add(track, cycle); }
         for (int i = 0; i < bursts.Count; i++)
         {
-            var cue = track.Copy(cycle == null);
-            if (cycle != null)
+            var cue = track.Copy(!track.reenterPerAttack && repeat == 0);
+            cue.stopAt += shift;
+            if (repeat > 0)
             {
-                cue.appearAt = WaveEntryTime(track, bursts[i][0].time, i);
+                cue.label += " [Repeat " + repeat + "]";
+                cue.randomSeed = unchecked(cue.randomSeed + repeat * 1000003);
+            }
+            if (track.reenterPerAttack)
+            {
+                // Keep the authored wave identity even when earlier teaching attacks are omitted.
+                int ordinal = originalBursts.FindIndex(b => b[0].burst == bursts[i][0].burst);
+                float sourceStart = track.attackTimes[bursts[i][0].burst];
+                float entry = WaveEntryTime(track, sourceStart, ordinal);
+                if (repeat > 0) entry = Math.Max(entry, sessionLoopFrom - cue.enterDuration);
+                cue.appearAt = entry + shift;
                 cue.attackTimes.Add(bursts[i][0].time);
-                cue.label += " [Attack " + (i + 1) + "]";
-                cue.randomSeed = unchecked(track.randomSeed + i * 104729);
+                cue.label += " [Attack " + (ordinal + 1) + "]";
+                cue.randomSeed = unchecked(cue.randomSeed + ordinal * 104729);
+            }
+            else if (repeat > 0)
+            {
+                float first = bursts[i][0].time - shift;
+                cue.appearAt = (track.appearAt >= sessionLoopFrom ? track.appearAt : first - cue.enterDuration) + shift;
+                foreach (float time in track.attackTimes)
+                    if (time >= sessionLoopFrom && time < sessionLoopEnd) cue.attackTimes.Add(time + shift);
             }
             var sequence = CreateSchedule(cue, bursts[i]);
-            // Empty-scene tests do not reconstruct completed waves or historical occupancy.
             if (cycle != null && sequence.IsComplete) continue;
             var state = new RunningCue { cue = cue, template = track.emitterTemplate,
                 cycle = cycle, waveShots = bursts[i], sequence = sequence,
                 restoreEntry = rangeTest && cue.appearAt < from };
             if (cue.placementMode == PlacementMode.FixedPoint)
                 TryGetFixedPlacement(cue.pointId, track.emitterTemplate, out cue.position,
-                    out cue.rotationZ, out cue.entrySide, out _); // Already validated.
+                    out cue.rotationZ, out cue.entrySide, out _);
             running.Add(state);
+        }
+    }
+
+    // Queue the next occurrence early enough for entry; never reset the global clock or hazards.
+    private void EnsureRepeatSchedules()
+    {
+        if (!sessionEndless) return;
+        float span = sessionLoopEnd - sessionLoopFrom;
+        int currentRepeat = EndlessAttackLoop.RepeatNumber(Elapsed, sessionLoopFrom, sessionLoopEnd);
+        // On a long frame stall, omit entire missed repeats instead of replaying them.
+        if (scheduledRepeat < currentRepeat - 1) scheduledRepeat = currentRepeat - 1;
+        while (sessionLoopEnd + scheduledRepeat * span <= Elapsed + repeatLookahead + AbsoluteAttackSchedule.MaxFrameLateness)
+        {
+            scheduledRepeat++;
+            foreach (EmitterTrack track in emitterTracks)
+                if (track.enabled) AddRunningTrack(track, 0, false, scheduledRepeat);
         }
     }
 
@@ -251,7 +308,7 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
             Status = "Missing Player / Main Camera, or Player Is Dead";
             return;
         }
-        string error = Validate();
+        string error = Validate(!rangeTest);
         if (error != null) { Status = error; Debug.LogError(error, this); return; }
         foreach (EmitterTrack track in emitterTracks)
             if (track.emitterTemplate != null && track.emitterTemplate.gameObject.scene == gameObject.scene)
@@ -262,6 +319,14 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         TestFrom = from;
         TestTo = to;
         Elapsed = from;
+        sessionEndless = endlessPhase3 && !rangeTest;
+        sessionLoopFrom = loopFrom;
+        sessionLoopEnd = duration;
+        scheduledRepeat = 0;
+        repeatLookahead = 0;
+        trackCycles.Clear();
+        foreach (EmitterTrack track in emitterTracks)
+            if (track.enabled) repeatLookahead = Math.Max(repeatLookahead, track.enterDuration);
         AttackLog.Clear();
         if (rangeTest) AttackLog.Add($"EMPTY RANGE [{from:0.##}, {to:0.##}) s | Earlier attacks / hazards omitted; random points selected from current availability.");
         foreach (EmitterTrack track in emitterTracks)
@@ -269,14 +334,20 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
             if (!track.enabled || (rangeTest && !OverlapsRange(track, from, to))) continue;
             AddRunningTrack(track, from, rangeTest);
         }
+        EnsureRepeatSchedules();
         IsRunning = true;
-        Status = rangeTest ? $"Empty Range {from:0.##}-{to:0.##} s" : "Loop1 Running";
+        Status = rangeTest ? $"Empty Range {from:0.##}-{to:0.##} s" : sessionEndless ? "Endless P3 - first pass" : "Loop1 Running";
         // Placement only: never fire or reconstruct historical projectiles during setup.
         if (rangeTest) foreach (RunningCue state in running) TickPlacement(state);
     }
 
-    public string Validate()
+    public string Validate(bool includeEndless = true)
     {
+        if (endlessPhase3 && includeEndless)
+        {
+            string loopError = EndlessAttackLoop.Validate(loopFrom, duration, phase3Start);
+            if (loopError != null) return loopError;
+        }
         if (!Finite(minEmitterSpacing) || minEmitterSpacing < 0) return "Fixed Point Spacing must be finite and non-negative.";
         foreach (EmitterTrack track in emitterTracks)
         {
@@ -316,6 +387,9 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
                 lastShot = shot.time;
             }
         }
+        if (endlessPhase3 && includeEndless && !emitterTracks.Exists(track => track.enabled &&
+            track.attackTimes.Exists(time => time >= loopFrom && time < duration)))
+            return "The endless segment needs at least one enabled Attack Time.";
         return null;
     }
 
@@ -323,7 +397,8 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
     {
         if (!IsRunning) return;
         if (player == null || player.IsDead) { StopAndClear("Player Dead - Cleared"); return; }
-        if (Elapsed >= TestTo && !ending)
+        EnsureRepeatSchedules();
+        if (!sessionEndless && Elapsed >= TestTo && !ending)
         {
             ending = true;
             Status = "Clearing & Exiting";
@@ -344,7 +419,16 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         {
             if (running.TrueForAll(state => state.finished)) { IsRunning = false; Status = IsRangeTest ? "Range Complete - Cleared" : "Loop1 Complete - Cleared"; }
         }
-        else Elapsed = Mathf.Min(TestTo, Elapsed + Time.deltaTime);
+        else
+        {
+            if (sessionEndless)
+            {
+                running.RemoveAll(state => state.finished && Elapsed >= state.cue.stopAt);
+                Status = $"Endless P3 | Repeat {RepeatNumber} | Pattern {PatternTime:0.##} s | Total {Elapsed:0.##} s";
+                Elapsed += Time.deltaTime;
+            }
+            else Elapsed = Mathf.Min(TestTo, Elapsed + Time.deltaTime);
+        }
     }
 
     private void Tick(RunningCue state)
@@ -380,7 +464,7 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         });
         // Finish every shot in this burst, then wait only for the emitter's own work.
         // Already-launched bullets and ground areas keep living after the emitter exits.
-        if (state.waveShots != null && state.sequence.IsComplete && state.instance != null && !state.emitter.IsBusy)
+        if (state.cue.reenterPerAttack && state.sequence.IsComplete && state.instance != null && !state.emitter.IsBusy)
             BeginExit(state);
     }
 
@@ -661,28 +745,11 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         foreach (RunningCue state in RuntimeInstances())
             if (state.instance != null) { state.instance.SetActive(false); Destroy(state.instance); }
         running.Clear();
+        trackCycles.Clear();
         pointOccupancy.Clear();
         ClearAllAttacks();
         Status = status;
     }
-    private void ClearAllAttacks()
-    {
-        ClearAttacks<Bullet>();
-        ClearAttacks<PatternBullet>();
-        ClearAttacks<BounceBullet>();
-        ClearAttacks<TraceBullet>();
-        ClearAttacks<LaserBeam>();
-        ClearAttacks<ImpactBullet>();
-        ClearAttacks<GroundArea>();
-    }
-    private void ClearAttacks<T>() where T : Component
-    {
-        foreach (T attack in FindObjectsOfType<T>(true))
-            if (attack.gameObject.scene == gameObject.scene)
-            {
-                attack.gameObject.SetActive(false);
-                Destroy(attack.gameObject);
-            }
-    }
+    private void ClearAllAttacks() => AttackCleanup.Clear(gameObject.scene);
     private void OnDisable() { if (Application.isPlaying && initialized) StopAndClear(); }
 }

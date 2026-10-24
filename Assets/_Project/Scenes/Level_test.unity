@@ -122,6 +122,37 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &23834969
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 23834970}
+  m_Layer: 0
+  m_Name: Point_05
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &23834970
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 23834969}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: -2, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 4
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &49424481
 GameObject:
   m_ObjectHideFlags: 0
@@ -216,6 +247,37 @@ Transform:
   - {fileID: 2131479274}
   m_Father: {fileID: 0}
   m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &226111763
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 226111764}
+  m_Layer: 0
+  m_Name: Point_06
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &226111764
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 226111763}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -2, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 5
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &246646942
 GameObject:
@@ -559,6 +621,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &534280504
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 534280505}
+  m_Layer: 0
+  m_Name: Point_09-2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &534280505
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 534280504}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.5, y: -1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 9
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &623882956
 GameObject:
@@ -1037,6 +1130,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 4
       spreadAngle: 60
@@ -1044,7 +1138,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 6
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 0
     stopAt: 6
     position: {x: 6, y: 4, z: 0}
@@ -1063,6 +1160,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 230786251
+    reenterPerAttack: 1
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1070,7 +1168,10 @@ MonoBehaviour:
       burstCount: 4
       shotInterval: 0.5
       cooldown: 8
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 43
     stopAt: 154
     position: {x: -5.49, y: 4.58, z: -0.08644457}
@@ -1100,6 +1201,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1107,7 +1209,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 5
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 18
     stopAt: 25
     position: {x: 8.3, y: -1.8, z: 0}
@@ -1126,6 +1231,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1133,7 +1239,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 5
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 19
     stopAt: 26
     position: {x: 8.3, y: 0, z: 0}
@@ -1152,6 +1261,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1159,7 +1269,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 5
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 20
     stopAt: 27
     position: {x: 8.3, y: 1.8, z: 0}
@@ -1178,6 +1291,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1185,7 +1299,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 27
     stopAt: 34
     position: {x: 8, y: -4, z: 0}
@@ -1204,6 +1321,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1211,7 +1329,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 28
     stopAt: 35
     position: {x: 8, y: 4, z: 0}
@@ -1230,6 +1351,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1237,7 +1359,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 27.5
     stopAt: 34.5
     position: {x: 1, y: -4, z: 0}
@@ -1256,6 +1381,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1263,7 +1389,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 28.5
     stopAt: 35.5
     position: {x: 1, y: 4, z: 0}
@@ -1281,7 +1410,8 @@ MonoBehaviour:
     emitterCount: 5
     region: 0
     minSpacing: 4
-    randomSeed: 1
+    randomSeed: -1055710152
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1289,7 +1419,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 5
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 35
     stopAt: 42
     position: {x: 8.5, y: 2, z: 0}
@@ -1302,12 +1435,13 @@ MonoBehaviour:
     emitterTemplate: {fileID: 1469203815}
   - label: Bounce
     enabled: 1
-    placementMode: 0
+    placementMode: 2
     pointId: 
-    emitterCount: 3
+    emitterCount: 1
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 1
     attack:
       bulletCount: 1
       spreadAngle: 0
@@ -1315,19 +1449,26 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 8
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
-    appearAt: 40
-    stopAt: 300
+      landingPointObjects: []
+    appearAt: 4
+    stopAt: 520
     position: {x: 3, y: 4.3, z: 0}
     rotationZ: 0
     entrySide: 0
     enterDuration: 1
     attackTimes:
-    - 42
-    - 72
-    - 102
-    - 132
-    - 162
+    - 5
+    - 75
+    - 135
+    - 195
+    - 255
+    - 345
+    - 375
+    - 435
+    - 495
     exitDuration: 1
     emitterTemplate: {fileID: 121472946}
   - label: Fan2
@@ -1338,6 +1479,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: -1575887869
+    reenterPerAttack: 0
     attack:
       bulletCount: 4
       spreadAngle: 60
@@ -1345,7 +1487,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 6
     stopAt: 12
     position: {x: 0, y: 0, z: 0}
@@ -1364,6 +1509,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: -919766676
+    reenterPerAttack: 0
     attack:
       bulletCount: 4
       spreadAngle: 60
@@ -1371,7 +1517,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 12
     stopAt: 18
     position: {x: 0, y: 0, z: 0}
@@ -1390,6 +1539,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 1
     attack:
       bulletCount: 5
       spreadAngle: 70
@@ -1397,9 +1547,12 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 63
-    stopAt: 88
+    stopAt: 89
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -1418,6 +1571,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 1
     attack:
       bulletCount: 5
       spreadAngle: 70
@@ -1425,9 +1579,12 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 63
-    stopAt: 88
+    stopAt: 89
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -1446,6 +1603,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1453,10 +1611,13 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 90
     stopAt: 99
-    position: {x: -9.5, y: 0, z: 0}
+    position: {x: -8.5, y: 0, z: 0}
     rotationZ: -90
     entrySide: 0
     enterDuration: 0.5
@@ -1472,6 +1633,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1479,7 +1641,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 100
     stopAt: 110
     position: {x: -8.5, y: -2, z: 0}
@@ -1498,6 +1663,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1505,7 +1671,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 101
     stopAt: 110
     position: {x: -6.5, y: -4.5, z: 0}
@@ -1524,6 +1693,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1531,7 +1701,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 102
     stopAt: 110
     position: {x: -3, y: -5, z: 0}
@@ -1550,6 +1723,7 @@ MonoBehaviour:
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1557,7 +1731,10 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 103
     stopAt: 110
     position: {x: 0.5, y: -5, z: 0}
@@ -1570,12 +1747,13 @@ MonoBehaviour:
     emitterTemplate: {fileID: 1469203815}
   - label: Laser4-2
     enabled: 1
-    placementMode: 1
+    placementMode: 0
     pointId: Bottom_10
     emitterCount: 3
     region: 0
     minSpacing: 2
     randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1583,10 +1761,13 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 90
     stopAt: 99
-    position: {x: 8.5, y: 0, z: 0}
+    position: {x: 0, y: -4.5, z: 0}
     rotationZ: 0
     entrySide: 0
     enterDuration: 0.5
@@ -1594,14 +1775,15 @@ MonoBehaviour:
     - 91
     exitDuration: 0.5
     emitterTemplate: {fileID: 1469203815}
-  - label: Fan5
+  - label: Fan5-1
     enabled: 1
     placementMode: 2
     pointId: 
     emitterCount: 2
-    region: 0
+    region: 3
     minSpacing: 5
     randomSeed: -1944696542
+    reenterPerAttack: 1
     attack:
       bulletCount: 4
       spreadAngle: 50
@@ -1609,9 +1791,12 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 118
-    stopAt: 130
+    stopAt: 131
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -1626,9 +1811,10 @@ MonoBehaviour:
     placementMode: 2
     pointId: 
     emitterCount: 3
-    region: 0
+    region: 4
     minSpacing: 5
     randomSeed: -1217163175
+    reenterPerAttack: 0
     attack:
       bulletCount: 4
       spreadAngle: 50
@@ -1636,9 +1822,12 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
+      landingPointObjects: []
     appearAt: 140
-    stopAt: 151
+    stopAt: 153
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
@@ -1655,7 +1844,8 @@ MonoBehaviour:
     emitterCount: 3
     region: 0
     minSpacing: 4
-    randomSeed: 1
+    randomSeed: -1607401509
+    reenterPerAttack: 1
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1663,25 +1853,261 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
-    appearAt: 113
-    stopAt: 121
+      landingPointObjects: []
+    appearAt: 112
+    stopAt: 154
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
     enterDuration: 0.5
     attackTimes:
     - 114
+    - 131
+    - 148
     exitDuration: 0.5
     emitterTemplate: {fileID: 1469203815}
-  - label: Laser6-2
+  - label: "InkSlow\u6559\u5B66"
+    enabled: 1
+    placementMode: 1
+    pointId: Left_06
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 2
+      shotInterval: 10
+      cooldown: 2
+      groundLifetime: 180
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 155
+    stopAt: 180
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 156
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1829061368}
+  - label: "InkBurn\u6559\u5B66"
+    enabled: 1
+    placementMode: 1
+    pointId: Right_05
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 2
+      shotInterval: 8
+      cooldown: 2
+      groundLifetime: 120
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 173
+    stopAt: 188
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 174
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 510946650}
+  - label: InkSlow1
+    enabled: 1
+    placementMode: 2
+    pointId: Top_11
+    emitterCount: 1
+    region: 1
+    minSpacing: 1
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 180
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 189
+    stopAt: 520
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 191
+    - 247
+    - 302
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1829061368}
+  - label: InkSlow4
+    enabled: 1
+    placementMode: 2
+    pointId: Top_11
+    emitterCount: 1
+    region: 3
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 180
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 378
+    stopAt: 520
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 380
+    - 410
+    - 440
+    - 470
+    - 500
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1829061368}
+  - label: Trace2
     enabled: 1
     placementMode: 2
     pointId: 
-    emitterCount: 3
+    emitterCount: 1
+    region: 4
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 5
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 195
+    stopAt: 227
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 196
+    - 205
+    - 214
+    - 223
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 49424482}
+  - label: InkBurn1
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 1
+    region: 2
+    minSpacing: 1
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 120
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 228
+    stopAt: 520
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 230
+    - 270
+    - 310
+    - 350
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 510946650}
+  - label: Fan6
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 2
     region: 0
     minSpacing: 4
     randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 4
+      spreadAngle: 70
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 230
+    stopAt: 318
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 232
+    - 242
+    - 252
+    - 262
+    - 272
+    - 282
+    - 292
+    - 302
+    - 312
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1083625427}
+  - label: Laser6-1
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
     attack:
       bulletCount: 1
       spreadAngle: 40
@@ -1689,21 +2115,880 @@ MonoBehaviour:
       burstCount: 1
       shotInterval: 0.5
       cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
       landingPoints: []
-    appearAt: 135
-    stopAt: 143
+      landingPointObjects: []
+    appearAt: 248
+    stopAt: 258
+    position: {x: 4.5, y: -5, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 249
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser7-1
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 276
+    stopAt: 287
+    position: {x: 8.5, y: 1, z: 0}
+    rotationZ: 135
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 277
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser7-2
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 277
+    stopAt: 287
+    position: {x: 6.8, y: 3.5, z: 0}
+    rotationZ: 135
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 278
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser7-3
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 278
+    stopAt: 287
+    position: {x: 4.5, y: 4.5, z: 0}
+    rotationZ: 135
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 279
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser7-4
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 279
+    stopAt: 287
+    position: {x: 1.8, y: 4.5, z: 0}
+    rotationZ: 135
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 280
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser7-5
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 280
+    stopAt: 287
+    position: {x: -1.5, y: 4.5, z: 0}
+    rotationZ: 135
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 281
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser8-1
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 304
+    stopAt: 316
+    position: {x: -7, y: 4.5, z: 0}
+    rotationZ: 240
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 305
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser8-2
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 305
+    stopAt: 316
+    position: {x: -7.5, y: 2, z: 0}
+    rotationZ: 240
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 306
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser8-3
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 306
+    stopAt: 316
+    position: {x: -8, y: -0.5, z: 0}
+    rotationZ: 240
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 307
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser8-4
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 307
+    stopAt: 316
+    position: {x: -5, y: -4.5, z: 0}
+    rotationZ: -30
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 308
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser8-5
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 308
+    stopAt: 316
+    position: {x: -2, y: -5, z: 0}
+    rotationZ: -30
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 309
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser6-2
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 249
+    stopAt: 258
+    position: {x: 2.5, y: -5, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 250
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser6-3
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 250
+    stopAt: 258
+    position: {x: 0, y: -5, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 251
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser6-4
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 251
+    stopAt: 258
+    position: {x: -2.5, y: -5, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 252
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser6-5
+    enabled: 1
+    placementMode: 0
+    pointId: Bottom_01
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 252
+    stopAt: 258
+    position: {x: -4.5, y: -5, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 253
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Laser9
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 6
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 317
+    stopAt: 352
     position: {x: 0, y: 0, z: 0}
     rotationZ: 0
     entrySide: 0
     enterDuration: 0.5
     attackTimes:
-    - 136
+    - 318
+    - 332
+    - 346
     exitDuration: 0.5
     emitterTemplate: {fileID: 1469203815}
+  - label: Trace3
+    enabled: 1
+    placementMode: 2
+    pointId: Bottom_08
+    emitterCount: 1
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 3
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 320
+    stopAt: 352
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 321
+    - 330
+    - 339
+    - 348
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 49424482}
+  - label: Impact1
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 4
+      shotInterval: 3
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 1
+      landingPoints:
+      - {x: 0, y: 0}
+      landingPointObjects:
+      - {fileID: 1345352670}
+      - {fileID: 1618438630}
+      - {fileID: 623882957}
+      - {fileID: 744891627}
+    appearAt: 354
+    stopAt: 378
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 355
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 2089361789}
+  - label: Impact2
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 5
+      shotInterval: 8
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 1
+      landingPoints:
+      - {x: 0, y: 0}
+      landingPointObjects:
+      - {fileID: 23834970}
+      - {fileID: 226111764}
+      - {fileID: 1831800681}
+      - {fileID: 1435784853}
+      - {fileID: 1865353711}
+    appearAt: 388
+    stopAt: 450
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 389
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 2089361789}
+  - label: Impact3
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 2
+      shotInterval: 2
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 1
+      landingPoints:
+      - {x: 0, y: 0}
+      landingPointObjects:
+      - {fileID: 921866035}
+      - {fileID: 2013417494}
+    appearAt: 459
+    stopAt: 467
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 460
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 2089361789}
+  - label: Impact4
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 2
+      shotInterval: 2
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 1
+      landingPoints:
+      - {x: 0, y: 0}
+      landingPointObjects:
+      - {fileID: 1000327792}
+      - {fileID: 534280505}
+    appearAt: 472
+    stopAt: 480
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 473
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 2089361789}
+  - label: Impact5
+    enabled: 1
+    placementMode: 0
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 0
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 4
+      shotInterval: 2
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 1
+      landingPoints:
+      - {x: 0, y: 0}
+      landingPointObjects:
+      - {fileID: 1345352670}
+      - {fileID: 623882957}
+      - {fileID: 1618438630}
+      - {fileID: 744891627}
+    appearAt: 490
+    stopAt: 500
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 491
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 2089361789}
+  - label: Trace4
+    enabled: 1
+    placementMode: 1
+    pointId: Bottom_18
+    emitterCount: 3
+    region: 0
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 4
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 387
+    stopAt: 520
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 388
+    - 398
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 49424482}
+  - label: Fan7
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 1
+    region: 1
+    minSpacing: 2
+    randomSeed: -2014900660
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 5
+      spreadAngle: 60
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 385
+    stopAt: 475
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 386
+    - 414
+    - 442
+    - 470
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1083625427}
+  - label: Fan8
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 2
+    region: 1
+    minSpacing: 2
+    randomSeed: -1917334505
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 5
+      spreadAngle: 60
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 385
+    stopAt: 489
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 400
+    - 428
+    - 456
+    - 484
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1083625427}
+  - label: Laser10
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 3
+    region: 0
+    minSpacing: 3
+    randomSeed: 1079286400
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 0
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 450
+    stopAt: 520
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 451
+    - 481
+    - 511
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 1469203815}
+  - label: Trace5
+    enabled: 1
+    placementMode: 2
+    pointId: Left_01
+    emitterCount: 3
+    region: 1
+    minSpacing: 2
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 0
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 484
+    stopAt: 518
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 485
+    - 500
+    - 515
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 49424482}
+  - label: InkBurn4
+    enabled: 1
+    placementMode: 2
+    pointId: 
+    emitterCount: 1
+    region: 4
+    minSpacing: 1
+    randomSeed: 1
+    reenterPerAttack: 1
+    attack:
+      bulletCount: 1
+      spreadAngle: 40
+      aimAtPlayer: 1
+      burstCount: 1
+      shotInterval: 0.5
+      cooldown: 2
+      groundLifetime: 120
+      landingPointSource: 0
+      landingPoints: []
+      landingPointObjects: []
+    appearAt: 388
+    stopAt: 520
+    position: {x: 0, y: 0, z: 0}
+    rotationZ: 0
+    entrySide: 0
+    enterDuration: 0.5
+    attackTimes:
+    - 390
+    - 410
+    - 430
+    - 450
+    - 470
+    - 490
+    - 510
+    exitDuration: 0.5
+    emitterTemplate: {fileID: 510946650}
   player: {fileID: 1053669312}
   pointLibrary: {fileID: 1913563562}
   minEmitterSpacing: 2
-  duration: 300
+  duration: 521
+  phase2Start: 155
+  phase3Start: 354
   playOnStart: 1
   tracks: []
   sceneEmitters:
@@ -1718,6 +3003,68 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 1829061367}
   - {fileID: 2089361787}
+--- !u!1 &921866034
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 921866035}
+  m_Layer: 0
+  m_Name: Point_08-1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &921866035
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 921866034}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1000327791
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1000327792}
+  m_Layer: 0
+  m_Name: Point_09-1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1000327792
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1000327791}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 8
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1042448702
 GameObject:
   m_ObjectHideFlags: 0
@@ -1985,9 +3332,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe8d2bebc12858a43b14df9248bc6edf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 10
-  invincibilityDuration: 0.5
-  redFlashDuration: 0.15
+  maxHealth: 50
+  invincibilityDuration: 0.8
+  redFlashDuration: 0.2
   hitColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   blinkInterval: 0.08
   blinkAlpha: 0.35
@@ -2008,7 +3355,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.23
+  m_Radius: 0.2
 --- !u!50 &1053669314
 Rigidbody2D:
   serializedVersion: 4
@@ -2623,6 +3970,37 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1435784852
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1435784853}
+  m_Layer: 0
+  m_Name: Point_09-1
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1435784853
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1435784852}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.5, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 11
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1469203814
 GameObject:
   m_ObjectHideFlags: 0
@@ -2918,6 +4296,68 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1831800680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1831800681}
+  m_Layer: 0
+  m_Name: Point_07
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1831800681
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1831800680}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2, y: 1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1865353710
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1865353711}
+  m_Layer: 0
+  m_Name: Point_09-2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1865353711
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1865353710}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -3.5, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 12
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1869588440
 GameObject:
   m_ObjectHideFlags: 0
@@ -3197,6 +4637,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1988300371}
   m_CullTransparentMesh: 1
+--- !u!1 &2013417493
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2013417494}
+  m_Layer: 0
+  m_Name: Point_08-2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2013417494
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2013417493}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.5, y: -1, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2131441886}
+  m_RootOrder: 10
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2038095299
 GameObject:
   m_ObjectHideFlags: 0
@@ -3456,6 +4927,15 @@ Transform:
   - {fileID: 1618438630}
   - {fileID: 623882957}
   - {fileID: 744891627}
+  - {fileID: 23834970}
+  - {fileID: 226111764}
+  - {fileID: 1831800681}
+  - {fileID: 921866035}
+  - {fileID: 1000327792}
+  - {fileID: 534280505}
+  - {fileID: 2013417494}
+  - {fileID: 1435784853}
+  - {fileID: 1865353711}
   m_Father: {fileID: 2038095300}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

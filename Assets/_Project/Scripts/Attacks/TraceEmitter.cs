@@ -10,6 +10,7 @@ public class TraceEmitter : MonoBehaviour, ITimelineEmitter, IEmitterOrientation
     [SerializeField] private Transform muzzle;
     private bool aimAtTarget;
     private TraceBullet preparingDrop, latestDrop;
+    public float DefaultGroundLifetime => dropPrefab != null ? dropPrefab.DefaultGroundLifetime : 0;
     public bool IsBusy => latestDrop != null && latestDrop.IsPreparing;
     public bool CanFire => preparingDrop == null || !preparingDrop.IsPreparing;
     public float PreparationDuration => 0;
@@ -27,9 +28,9 @@ public class TraceEmitter : MonoBehaviour, ITimelineEmitter, IEmitterOrientation
         if (drop.HasTrackingWarning)
         {
             preparingDrop = drop;
-            drop.Initialize(lockedPosition, player, source, AimAt);
+            drop.Initialize(lockedPosition, player, source, AimAt, settings.groundLifetime);
         }
-        else drop.Initialize(lockedPosition, player);
+        else drop.Initialize(lockedPosition, player, groundLifetime: settings.groundLifetime);
         return true;
     }
 

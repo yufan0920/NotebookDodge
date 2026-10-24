@@ -28,14 +28,22 @@ public class GroundArea : MonoBehaviour
     private Mesh mesh;
     private Material material;
 
-    public void Initialize(PlayerHealth target)
+    public float DefaultLifetime => ResolveLifetime(lifetime, 0);
+
+    public static float ResolveLifetime(float prefabLifetime, float trackLifetime)
+    {
+        float value = trackLifetime > 0 && !float.IsInfinity(trackLifetime) ? trackLifetime : prefabLifetime;
+        return float.IsNaN(value) || float.IsInfinity(value) ? 0.1f : Mathf.Max(0.1f, value);
+    }
+
+    public void Initialize(PlayerHealth target, float trackLifetime = 0)
     {
         player = target;
         center = transform.position;
         transform.rotation = Quaternion.identity;
         transform.localScale = Vector3.one;
         effectiveRadius = Mathf.Max(0.01f, radius);
-        expiresAt = Time.time + Mathf.Max(0.1f, lifetime);
+        expiresAt = Time.time + ResolveLifetime(lifetime, trackLifetime);
         visualId = ++nextVisualId;
         initialized = true;
         CreateVisual();

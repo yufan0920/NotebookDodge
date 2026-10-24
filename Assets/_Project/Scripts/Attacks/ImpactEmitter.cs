@@ -10,8 +10,8 @@ public class ImpactEmitter : MonoBehaviour, ITimelineEmitter
     public bool Fire(AttackSettings settings, PlayerHealth player, int shotIndex)
     {
         if (player == null || player.IsDead || bulletPrefab == null || bulletPrefab.gameObject.scene.IsValid()) return false;
-        if (settings.landingPoints == null || settings.landingPoints.Length == 0) return false;
-        Vector2 position = settings.landingPoints[shotIndex % settings.landingPoints.Length];
+        if (settings.ValidateLandingPoints(gameObject.scene) != null ||
+            !settings.TryGetLandingPoint(shotIndex, out Vector2 position)) return false;
         ImpactBullet bullet = Instantiate(bulletPrefab, new Vector3(position.x, position.y, 0), Quaternion.identity);
         return bullet.Initialize(position, player);
     }

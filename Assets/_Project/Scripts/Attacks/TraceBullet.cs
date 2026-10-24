@@ -47,6 +47,8 @@ public class TraceBullet : MonoBehaviour
     [Header("Lifetime")]
     [SerializeField, Min(0.1f)] private float maxLifetime = 30f;
 
+    public float DefaultGroundLifetime => groundAreaPrefab != null ? groundAreaPrefab.DefaultLifetime : 0;
+    private float groundLifetime;
     public bool IsPreparing => initialized && !launched && !exploded;
     public bool HasTrackingWarning => trackDuringWarning && preLaunchDuration > 0f;
     private Transform launchOrigin;
@@ -82,11 +84,14 @@ public class TraceBullet : MonoBehaviour
         Vector2 lockedPosition,
         PlayerHealth targetPlayer,
         Transform origin = null,
-        System.Action<Vector2> aim = null)
+        System.Action<Vector2> aim = null,
+        float groundLifetime = 0)
     {
         StopAllCoroutines();
         launchOrigin = origin;
         aimAtPosition = aim;
+        // Capture this shot's setting; later track edits and emitter exit cannot change it.
+        this.groundLifetime = groundLifetime;
 
 
         target =
@@ -563,7 +568,7 @@ public class TraceBullet : MonoBehaviour
             {
                 GroundArea area = Instantiate(groundAreaPrefab,
                     new Vector3(explosionPosition.x, explosionPosition.y, 0), Quaternion.identity);
-                area.Initialize(player);
+                area.Initialize(player, groundLifetime);
             }
         }
 

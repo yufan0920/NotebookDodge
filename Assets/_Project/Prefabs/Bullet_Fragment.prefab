@@ -141,7 +141,7 @@ MonoBehaviour:
   unfoldDistance: 0.5
   unfoldDuration: 0.2
   holdDuration: 1
-  normalSpeed: 5
+  normalSpeed: 3
   accelerationDuration: 0.3
   speedCurve:
     serializedVersion: 2

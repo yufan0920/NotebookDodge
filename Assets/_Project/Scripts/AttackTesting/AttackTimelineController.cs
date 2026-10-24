@@ -21,6 +21,7 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         public EmitterPointLibrary.Region region = EmitterPointLibrary.Region.All;
         [Min(0)] public float minSpacing = 2;
         public int randomSeed = 1;
+        public bool reenterPerAttack;
         public AttackSettings attack = new AttackSettings();
         [Min(0)] public float appearAt;
         [Min(0)] public float stopAt = 60;
@@ -30,11 +31,11 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         [Min(0)] public float enterDuration = 0.5f;
         public List<float> attackTimes = new List<float>();
         [Min(0)] public float exitDuration = 0.5f;
-        public Cue Copy()
+        public Cue Copy(bool copyAttackTimes = true)
         {
             var copy = (Cue)MemberwiseClone();
             copy.attack = attack.Copy();
-            copy.attackTimes = new List<float>(attackTimes);
+            copy.attackTimes = copyAttackTimes ? new List<float>(attackTimes) : new List<float>();
             return copy;
         }
     }
@@ -64,6 +65,7 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
                 placementMode = cue.placementMode, pointId = cue.pointId,
                 emitterCount = cue.emitterCount, region = cue.region,
                 minSpacing = cue.minSpacing, randomSeed = cue.randomSeed,
+                reenterPerAttack = cue.reenterPerAttack,
                 attack = cue.attack == null ? null : cue.attack.Copy(),
                 appearAt = cue.appearAt, stopAt = cue.stopAt,
                 position = cue.position, rotationZ = cue.rotationZ, entrySide = cue.entrySide,
@@ -111,9 +113,23 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
     [SerializeField] private EmitterPointLibrary pointLibrary = null;
     [SerializeField, Min(0)] private float minEmitterSpacing = 2;
     [SerializeField, Min(1)] private float duration = 60;
+    // Editor time-view boundaries only. Scheduling always uses the original global seconds.
+    [SerializeField, Min(0)] private float phase2Start = 155;
+    [SerializeField, Min(0)] private float phase3Start = 355;
     [SerializeField] private bool playOnStart = true;
     [SerializeField, HideInInspector] private List<Track> tracks = new List<Track>();
     [SerializeField] private List<GameObject> sceneEmitters = new List<GameObject>();
+    private sealed class ReentryCycle
+    {
+        public RunningCue activeWave;
+        public readonly HashSet<string> previousPoints = new HashSet<string>(StringComparer.Ordinal);
+        public bool TryBegin(RunningCue wave)
+        {
+            if (activeWave != null && !activeWave.finished) return false;
+            activeWave = wave;
+            return true;
+        }
+    }
     private sealed class RunningCue
     {
         public Cue cue;
@@ -131,6 +147,9 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         public EmitterPointSelection.Reservation reservation;
         public string placementFailure;
         public List<RunningCue> members;
+        public ReentryCycle cycle;
+        public bool entryChecked;
+        public List<AbsoluteAttackSchedule.Shot> waveShots;
 
     }
     private readonly List<RunningCue> running = new List<RunningCue>();
@@ -142,6 +161,8 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
     public float Elapsed { get; private set; }
     public bool HasStarted => initialized;
     public float Duration => duration;
+    public float Phase2Start => phase2Start;
+    public float Phase3Start => phase3Start;
     public bool IsRangeTest { get; private set; }
     public float TestFrom { get; private set; }
     public float TestTo { get; private set; }
@@ -185,10 +206,43 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
     private static float EntryStart(float appearAt, float now, bool restore)
         => restore || now - appearAt <= AbsoluteAttackSchedule.MaxFrameLateness ? appearAt : now;
 
-    private AbsoluteAttackSchedule CreateSchedule(Cue cue)
-        => IsRangeTest
-            ? new AbsoluteAttackSchedule(cue.attackTimes, cue.attack.burstCount, cue.attack.shotInterval, TestFrom, TestTo)
-            : new AbsoluteAttackSchedule(cue.attackTimes, cue.attack.burstCount, cue.attack.shotInterval);
+    private AbsoluteAttackSchedule CreateSchedule(Cue cue, List<AbsoluteAttackSchedule.Shot> waveShots = null)
+        => new AbsoluteAttackSchedule(waveShots ?? AbsoluteAttackSchedule.Expand(cue.attackTimes,
+            cue.attack.burstCount, cue.attack.shotInterval),
+            IsRangeTest ? TestFrom : float.NegativeInfinity, IsRangeTest ? TestTo : float.PositiveInfinity);
+
+    // The first appearance keeps its authored timing; later waves enter just before their attack.
+    public static float WaveEntryTime(Cue cue, float attackTime, int waveIndex)
+        => waveIndex == 0 ? cue.appearAt : attackTime - cue.enterDuration;
+
+    private void AddRunningTrack(EmitterTrack track, float from, bool rangeTest)
+    {
+        var bursts = track.reenterPerAttack
+            ? AbsoluteAttackSchedule.ExpandBursts(track.attackTimes, track.attack.burstCount, track.attack.shotInterval)
+            : new List<List<AbsoluteAttackSchedule.Shot>> { null };
+        var cycle = track.reenterPerAttack ? new ReentryCycle() : null;
+        for (int i = 0; i < bursts.Count; i++)
+        {
+            var cue = track.Copy(cycle == null);
+            if (cycle != null)
+            {
+                cue.appearAt = WaveEntryTime(track, bursts[i][0].time, i);
+                cue.attackTimes.Add(bursts[i][0].time);
+                cue.label += " [Attack " + (i + 1) + "]";
+                cue.randomSeed = unchecked(track.randomSeed + i * 104729);
+            }
+            var sequence = CreateSchedule(cue, bursts[i]);
+            // Empty-scene tests do not reconstruct completed waves or historical occupancy.
+            if (cycle != null && sequence.IsComplete) continue;
+            var state = new RunningCue { cue = cue, template = track.emitterTemplate,
+                cycle = cycle, waveShots = bursts[i], sequence = sequence,
+                restoreEntry = rangeTest && cue.appearAt < from };
+            if (cue.placementMode == PlacementMode.FixedPoint)
+                TryGetFixedPlacement(cue.pointId, track.emitterTemplate, out cue.position,
+                    out cue.rotationZ, out cue.entrySide, out _); // Already validated.
+            running.Add(state);
+        }
+    }
 
     private void BeginSession(float from, float to, bool rangeTest)
     {
@@ -213,16 +267,7 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         foreach (EmitterTrack track in emitterTracks)
         {
             if (!track.enabled || (rangeTest && !OverlapsRange(track, from, to))) continue;
-            var state = new RunningCue { cue = track.Copy(), template = track.emitterTemplate,
-                restoreEntry = rangeTest && track.appearAt < from };
-            if (track.placementMode == PlacementMode.FixedPoint)
-            {
-                if (!TryGetFixedPlacement(track.pointId, track.emitterTemplate, out state.cue.position,
-                    out state.cue.rotationZ, out state.cue.entrySide, out string placementError))
-                { StopAndClear(placementError); return; }
-            }
-            state.sequence = CreateSchedule(track);
-            running.Add(state);
+            AddRunningTrack(track, from, rangeTest);
         }
         IsRunning = true;
         Status = rangeTest ? $"Empty Range {from:0.##}-{to:0.##} s" : "Loop1 Running";
@@ -245,14 +290,20 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
             if (cue.placementMode == PlacementMode.RandomPoints &&
                 !TryGetRandomCandidates(cue, track.emitterTemplate, out _, out string randomError))
                 return prefix + randomError;
-            if (cue.enterDuration < 0 || cue.exitDuration < 0) return prefix + "Animation durations and delays cannot be negative.";
-            if (cue.appearAt < 0 || cue.appearAt >= duration) return prefix + "Appear At must be within the loop.";
-            if (cue.stopAt > duration || cue.stopAt <= cue.appearAt + cue.enterDuration)
+            if (!Finite(cue.enterDuration) || !Finite(cue.exitDuration) || cue.enterDuration < 0 || cue.exitDuration < 0) return prefix + "Animation durations must be finite and non-negative.";
+            if (!Finite(cue.appearAt) || cue.appearAt < 0 || cue.appearAt >= duration) return prefix + "Appear At must be within the loop.";
+            if (!Finite(cue.stopAt) || cue.stopAt > duration || cue.stopAt <= cue.appearAt + cue.enterDuration)
                 return prefix + "Stop At must be after entry and within the loop.";
-            if (cue.attack == null || cue.attack.shotInterval < 0.05f || cue.attack.burstCount < 1 || cue.attack.bulletCount < 1)
+            if (cue.attack == null || !Finite(cue.attack.shotInterval) || cue.attack.shotInterval < 0.05f || cue.attack.burstCount < 1 || cue.attack.bulletCount < 1)
                 return prefix + "Attack counts must be positive; intervals must be at least 0.05 s.";
-            if (track.emitterTemplate is ImpactEmitter && (cue.attack.landingPoints == null || cue.attack.landingPoints.Length == 0))
-                return prefix + "Add at least one Landing Point.";
+            if (track.emitterTemplate is TraceEmitter ink && ink.DefaultGroundLifetime > 0 &&
+                (!Finite(cue.attack.groundLifetime) || (cue.attack.groundLifetime != 0 && cue.attack.groundLifetime < 0.1f)))
+                return prefix + "Ground Lifetime must be at least 0.1 s (zero uses the prefab default).";
+            if (track.emitterTemplate is ImpactEmitter)
+            {
+                string landingError = cue.attack.ValidateLandingPoints(gameObject.scene);
+                if (landingError != null) return prefix + landingError;
+            }
             if (cue.attackTimes == null || cue.attackTimes.Count == 0) return prefix + "Add at least one Attack Time (loop seconds).";
             if ((long)cue.attackTimes.Count * cue.attack.burstCount * (cue.placementMode == PlacementMode.RandomPoints ? cue.emitterCount : 1) > 10000) return prefix + "Too many scheduled shots (maximum 10000 per track).";
             var shots = AbsoluteAttackSchedule.Expand(cue.attackTimes, cue.attack.burstCount, cue.attack.shotInterval);
@@ -286,6 +337,8 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
         // Finish exits first so reservation release does not depend on track ordering.
         foreach (RunningCue state in RuntimeInstances())
             if (!state.finished && (state.exitStarted >= 0 || (state.spawned && state.instance == null))) TickPlacement(state);
+        foreach (RunningCue state in running)
+            if (state.members != null) state.finished = state.members.TrueForAll(member => member.finished);
         foreach (RunningCue state in running) Tick(state);
         if (ending)
         {
@@ -325,13 +378,30 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
             if (AttackLog.Count > 200) AttackLog.RemoveAt(0);
             if (reason != null) Debug.LogWarning(record, this);
         });
+        // Finish every shot in this burst, then wait only for the emitter's own work.
+        // Already-launched bullets and ground areas keep living after the emitter exits.
+        if (state.waveShots != null && state.sequence.IsComplete && state.instance != null && !state.emitter.IsBusy)
+            BeginExit(state);
     }
 
     private void TickPlacement(RunningCue state)
     {
         Cue cue = state.cue;
+        if (state.finished) return;
+        if (ending && !state.spawned) { state.finished = true; return; }
+        if (Elapsed < cue.appearAt) return;
+        if (state.cycle != null && !state.entryChecked)
+        {
+            state.entryChecked = true;
+            if (!state.cycle.TryBegin(state))
+            {
+                state.placementFailure = "Wave SKIPPED: previous attack / exit is still active at the next entry time. Increase Attack Times spacing.";
+                state.finished = true;
+                RecordPlacement(state, state.placementFailure, true);
+                return;
+            }
+        }
         if (cue.placementMode == PlacementMode.RandomPoints) { TickRandomPlacement(state); return; }
-        if (state.finished || Elapsed < cue.appearAt) return;
         if (!state.spawned)
         {
             if (Elapsed >= cue.stopAt)
@@ -417,8 +487,9 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
             if (!TryGetRandomCandidates(state.cue, state.template, out var candidates, out string error))
             { SkipRandomGroup(state, error); return; }
             if (!pointOccupancy.TryReserve(candidates, state.cue.emitterCount, state.cue.minSpacing,
-                state.cue.randomSeed, out var reservation, out var selection))
-            { SkipRandomGroup(state, selection.Message); return; }
+                state.cue.randomSeed, out var reservation, out var selection, state.cycle?.previousPoints))
+            { SkipRandomGroup(state, selection.Message + (state.cycle != null
+                    ? " Previous-wave points are excluded; no fallback to the same points." : "")); return; }
 
             // Resolve every member before spawning any. A failed group never partially appears.
             var members = new List<RunningCue>();
@@ -437,11 +508,17 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
                     return;
                 }
                 members.Add(new RunningCue { cue = cue, template = state.template, reservation = reservation,
-                    restoreEntry = state.restoreEntry, sequence = CreateSchedule(cue) });
+                    restoreEntry = state.restoreEntry, waveShots = state.waveShots,
+                    sequence = CreateSchedule(cue, state.waveShots) });
                 ids.Add(point.Id);
             }
             state.members = members;
             state.spawned = true;
+            if (state.cycle != null)
+            {
+                state.cycle.previousPoints.Clear();
+                foreach (string id in ids) state.cycle.previousPoints.Add(id);
+            }
             RecordPlacement(state, "Random seed " + state.cue.randomSeed + " | Reserved " + string.Join(", ", ids), false);
         }
         foreach (var member in state.members)

@@ -140,7 +140,7 @@ MonoBehaviour:
   useCharge: 1
   unfoldDistance: 1
   unfoldDuration: 1
-  holdDuration: 2
+  holdDuration: 3
   normalSpeed: 5
   accelerationDuration: 0.3
   speedCurve:

@@ -62,8 +62,16 @@ public static class EmitterPointSelection
             => Select(candidates, count, spacing, seed, reservations);
 
         public bool TryReserve(IReadOnlyList<Candidate> candidates, int count, float spacing, int seed,
-            out Reservation reservation, out Result result)
+            out Reservation reservation, out Result result, ISet<string> excludedIds = null)
         {
+            // Reentry excludes the last successful wave without mutating the point library.
+            if (excludedIds != null && excludedIds.Count > 0)
+            {
+                var filtered = new List<Candidate>();
+                foreach (var point in candidates)
+                    if (!excludedIds.Contains(point.Id)) filtered.Add(point);
+                candidates = filtered;
+            }
             result = Preview(candidates, count, spacing, seed);
             reservation = null;
             if (!result.Success) return false; // Never partially reserve a failed group.

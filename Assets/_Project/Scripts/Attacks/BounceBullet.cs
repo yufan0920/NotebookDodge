@@ -6,9 +6,7 @@ public class BounceBullet : MonoBehaviour
 {
     [SerializeField, Min(0.01f)] private float speed = 3f;
     [SerializeField, Min(1)] private int damage = 1;
-    [SerializeField, Min(0.1f)] private float lifetime = 12f;
-    [Tooltip("允许反弹几次。0 表示直接飞过；次数用完后沿最后方向飞出，直到寿命结束。角落计一次。")]
-    [SerializeField, Min(0)] private int maxBounces = 3;
+    // Persistent for this session: no lifetime or bounce-count limit.
     [Tooltip("世界单位命中半径；反弹使用子弹中心，与玩家活动边界对齐。")]
     [SerializeField, Min(0.01f)] private float hitRadius = 0.1f;
     private PlayerMovement movement;
@@ -16,8 +14,7 @@ public class BounceBullet : MonoBehaviour
     private Vector2 direction;
     private readonly Vector2[] normals = new Vector2[4];
     private PlayerHealth player;
-    private int bounces;
-    private float age;
+    private bool warnedStepLimit;
     private bool initialized;
     private bool enteredArena;
     private float radius;
@@ -35,8 +32,7 @@ public class BounceBullet : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        age = 0;
-        bounces = 0;
+        warnedStepLimit = false;
         enteredArena = Contains(transform.position);
         initialized = true;
     }
@@ -45,8 +41,6 @@ public class BounceBullet : MonoBehaviour
     {
         if (!initialized) return;
         if (player == null || player.IsDead) { Destroy(gameObject); return; }
-        age += Time.fixedDeltaTime;
-        if (age >= Mathf.Max(0.1f, lifetime)) { Destroy(gameObject); return; }
         if (!RefreshBoundary())
         {
             Debug.LogError("Bounce bullet lost its valid Player Movement Area.", this);
@@ -59,23 +53,16 @@ public class BounceBullet : MonoBehaviour
         int safety = 0;
         while (travel > 0 && safety++ < 64)
         {
-            // 次数用完后永久直飞；不会在边界销毁，也不会再次进入反弹阶段。
-            if (bounces >= Mathf.Max(0, maxBounces))
-            {
-                if (!MoveStraight(ref position, travel)) return;
-                travel = 0;
-                break;
-            }
             if (!enteredArena)
             {
                 float entry;
                 if (!TryGetEntryDistance(position, travel, out entry))
                 {
-                    if (!MoveStraight(ref position, travel)) return;
+                    MoveStraight(ref position, travel);
                     travel = 0;
                     break;
                 }
-                if (!MoveStraight(ref position, entry)) return;
+                MoveStraight(ref position, entry);
                 travel = Mathf.Max(0, travel - entry);
                 enteredArena = true; // 首次飞入不算反弹，接下来碰到出口边界才反弹。
                 continue;
@@ -100,13 +87,10 @@ public class BounceBullet : MonoBehaviour
             if (HitsPlayer(position, segment))
             {
                 player.TakeDamage(damage);
-                Destroy(gameObject);
-                return;
             }
             position += direction * segment;
             travel -= segment;
             if (wallDistance > segment) break;
-            bounces++;
             Vector2 incomingDirection = direction;
             direction = Vector2.Reflect(direction, normal.normalized).normalized;
             for (int i = 0; i < 4; i++)
@@ -117,25 +101,22 @@ public class BounceBullet : MonoBehaviour
                     break;
                 }
         }
-        if (safety > 64)
+        if (safety > 64 && !warnedStepLimit)
         {
-            Debug.LogWarning("Bounce step exceeded safety limit; reduce speed or enlarge arena.", this);
-            Destroy(gameObject);
-            return;
+            // Keep the last safe position and resume next step instead of deleting the bullet.
+            warnedStepLimit = true;
+            Debug.LogWarning("Bounce step reached its safety limit; remaining movement was skipped. Reduce speed or enlarge arena.", this);
         }
         transform.position = new Vector3(position.x, position.y, 0);
     }
 
-    private bool MoveStraight(ref Vector2 position, float distance)
+    private void MoveStraight(ref Vector2 position, float distance)
     {
         if (HitsPlayer(position, distance))
         {
             player.TakeDamage(damage);
-            Destroy(gameObject);
-            return false;
         }
         position += direction * distance;
-        return true;
     }
 
     private bool RefreshBoundary()

@@ -75,6 +75,8 @@ public static class AttackTimingPreview
             using (var data = new SerializedObject(projectile))
             {
                 GetTiming(template, data, out _, out float busy, out _, out _);
+                DrawReentryWarning(clip, starts, count, attack.FindPropertyRelative("shotInterval").floatValue,
+                    template is TraceEmitter ? Mathf.Max(busy, Number(data, "preLaunchDuration")) : busy);
                 var shots = AbsoluteAttackSchedule.Expand(starts, count, attack.FindPropertyRelative("shotInterval").floatValue);
                 for (int i = 1; i < shots.Count; i++)
                     if (shots[i].time - shots[i - 1].time < busy - 0.0001f)
@@ -85,6 +87,25 @@ public static class AttackTimingPreview
             }
         }
     }
+    private static void DrawReentryWarning(SerializedProperty clip, List<float> starts, int count, float interval, float busy)
+    {
+        if (!clip.FindPropertyRelative("reenterPerAttack").boolValue) return;
+        starts = new List<float>(starts);
+        starts.Sort();
+        float enter = clip.FindPropertyRelative("enterDuration").floatValue;
+        float exit = clip.FindPropertyRelative("exitDuration").floatValue;
+        for (int i = 1; i < starts.Count; i++)
+        {
+            float finishes = starts[i - 1] + (count - 1) * interval + busy + exit;
+            float nextEntry = starts[i] - enter;
+            if (finishes > nextEntry - 0.0001f)
+            {
+                EditorGUILayout.HelpBox($"Reentry conflict: attack at {starts[i - 1]:0.##}s may not finish exiting until ~{finishes:0.##}s; next entry starts at {nextEntry:0.##}s. Increase spacing and allow a small frame margin. A blocked wave is skipped, never delayed.", MessageType.Warning);
+                break;
+            }
+        }
+    }
+
     public static void Draw(SerializedProperty clip, Object template)
     {
         if (template == null) return;
@@ -103,6 +124,8 @@ public static class AttackTimingPreview
         var attack = clip.FindPropertyRelative("attack");
         int count = attack.FindPropertyRelative("burstCount").intValue;
         if (count < 1 || (long)count * starts.Count > 10000) return;
+        DrawReentryWarning(clip, starts, count, attack.FindPropertyRelative("shotInterval").floatValue,
+                    template is TraceEmitter ? Mathf.Max(busy, Number(data, "preLaunchDuration")) : busy);
         var shots = AbsoluteAttackSchedule.Expand(starts, count, attack.FindPropertyRelative("shotInterval").floatValue);
         var text = new StringBuilder("Attack Start (s)\tPhase Preview\n");
         float previous = float.NegativeInfinity;
@@ -118,8 +141,18 @@ public static class AttackTimingPreview
             {
                 phases = $"Prelaunch {Range(at, at + prepare)}; flight starts {at + prepare:F2}s; impact time varies";
                 var area = data.FindProperty("groundAreaPrefab")?.objectReferenceValue;
-                if (area != null) phases += $"; ground area lasts {Number(new SerializedObject(area), "lifetime"):F2}s after impact";
+                if (area != null)
+                {
+                    using (var ground = new SerializedObject(area))
+                    {
+                        float lifetime = GroundArea.ResolveLifetime(Number(ground, "lifetime"),
+                            attack.FindPropertyRelative("groundLifetime").floatValue);
+                        phases += $"; ground area lasts {lifetime:F2}s after impact";
+                    }
+                }
             }
+            else if (template is BounceEmitter)
+                phases = $"Flight starts {at:F2}s; keeps bouncing until game / test end; player hits do not remove it";
             else if (template is ImpactEmitter)
                 phases = $"Warning + fall {Range(at, at + prepare)}; explosion / fragments start ~{at + prepare:F2}s; fragment hits vary";
             else

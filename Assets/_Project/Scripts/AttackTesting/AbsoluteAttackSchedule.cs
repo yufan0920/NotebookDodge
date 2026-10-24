@@ -8,28 +8,44 @@ public sealed class AbsoluteAttackSchedule
     {
         public float time;
         public int index;
+        public int burst;
     }
     private readonly List<Shot> shots;
     private int next;
     public const float MaxFrameLateness = 0.1f;
+    public bool IsComplete => next >= shots.Count;
     public AbsoluteAttackSchedule(List<float> starts, int burstCount, float interval)
         : this(starts, burstCount, interval, float.NegativeInfinity, float.PositiveInfinity) { }
 
     // Cold range tests omit earlier preparations without replaying or reporting them as missed.
     // Filter AFTER expansion so surviving burst shots keep their original index (Impact targets).
     public AbsoluteAttackSchedule(List<float> starts, int burstCount, float interval, float from, float to)
+        : this(Expand(starts, burstCount, interval), from, to) { }
+
+    // A wave retains full-track shot indices, including when a range starts mid-burst.
+    public AbsoluteAttackSchedule(List<Shot> plannedShots, float from, float to)
     {
         if (float.IsNaN(from) || float.IsNaN(to) || from >= to)
             throw new ArgumentException("Use an increasing range [from, to).");
-        shots = Expand(starts, burstCount, interval);
+        shots = new List<Shot>(plannedShots);
         shots.RemoveAll(shot => shot.time < from || shot.time >= to);
+    }
+
+    public static List<List<Shot>> ExpandBursts(List<float> starts, int burstCount, float interval)
+    {
+        var groups = new List<List<Shot>>();
+        for (int i = 0; i < starts.Count; i++) groups.Add(new List<Shot>());
+        foreach (var shot in Expand(starts, burstCount, interval)) groups[shot.burst].Add(shot);
+        groups.Sort((a, b) => a[0].time.CompareTo(b[0].time));
+        return groups;
     }
     public static List<Shot> Expand(List<float> starts, int burstCount, float interval)
     {
         var result = new List<Shot>();
         if (starts == null) return result;
-        foreach (float start in starts)
-            for (int i = 0; i < burstCount; i++) result.Add(new Shot { time = start + i * interval });
+        for (int burst = 0; burst < starts.Count; burst++)
+            for (int i = 0; i < burstCount; i++)
+                result.Add(new Shot { time = starts[burst] + i * interval, burst = burst });
         result.Sort((a, b) => a.time.CompareTo(b.time));
         for (int i = 0; i < result.Count; i++) { var shot = result[i]; shot.index = i; result[i] = shot; }
         return result;

@@ -8,6 +8,10 @@ using UnityEngine;
 public class AttackTimelineWindow : EditorWindow
 {
     [SerializeField] private int selectedTrack;
+    [SerializeField] private int timeView;
+    [SerializeField] private bool phasesOpen;
+    private float phase2Start, phase3Start, viewStart, viewEnd, fullDuration;
+    private string ViewName => timeView == 0 ? "Global" : "P" + timeView;
     [SerializeField] private bool playRequested;
     [SerializeField] private bool rangeOpen;
     [SerializeField] private float testFrom, testTo = 30;
@@ -87,11 +91,14 @@ public class AttackTimelineWindow : EditorWindow
         {
             float oldWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 78;
-            testFrom = EditorGUILayout.FloatField(new GUIContent("Test From (s)", "Inclusive. Active emitters resume entry progress; earlier attacks are not replayed."), testFrom);
-            testTo = EditorGUILayout.FloatField(new GUIContent("Test To (s)", "Exclusive. At this time attacks are cleared and emitters exit."), testTo);
+            testFrom = TimeValue(testFrom, "Test From (s)", "Inclusive. Earlier attacks are not replayed.");
+            testTo = TimeValue(testTo, "Test To (s)", "Exclusive. Attacks are cleared and emitters exit.");
             EditorGUIUtility.labelWidth = oldWidth;
         }
-        string error = AttackTimelineController.RangeError(testFrom, testTo, controller.Duration);
+        EditorGUILayout.LabelField("Global range: " + GlobalLabel(testFrom) + " - " + GlobalLabel(testTo), EditorStyles.miniLabel);
+        if (timeView != 0 && GUILayout.Button("Use " + ViewName + " Range"))
+        { testFrom = viewStart; testTo = viewEnd; GUI.FocusControl(null); }
+        string error = AttackTimelineController.RangeError(testFrom, testTo, fullDuration);
         using (new EditorGUI.DisabledScope(error != null))
             if (GUILayout.Button("Play Range")) RequestPlay(controller, true, testFrom, testTo);
         if (error != null) EditorGUILayout.HelpBox(error, MessageType.Warning);
@@ -101,6 +108,78 @@ public class AttackTimelineWindow : EditorWindow
     private static void Field(SerializedProperty parent, string name, string label, string tip = null)
         => EditorGUILayout.PropertyField(P(parent, name), new GUIContent(label, tip), true);
     private static string Seconds(float value) => value.ToString("0.##");
+
+    private static string GlobalLabel(float value) => Seconds(value) + "s (" + AttackTimelineTimeView.Clock(value) + ")";
+    private string DualTime(float global)
+    {
+        int phase = timeView == 0 ? AttackTimelineTimeView.PhaseAt(global, phase2Start, phase3Start) : timeView;
+        float offset = AttackTimelineTimeView.Offset(phase, phase2Start, phase3Start);
+        return "P" + phase + " " + Seconds(global - offset) + "s | Global " + GlobalLabel(global);
+    }
+    private string TableTime(float global)
+        => timeView == 0 ? GlobalLabel(global)
+            : Seconds(global - viewStart) + "s | G " + Seconds(global) + "s";
+
+    private void DrawTimeView(SerializedObject data, float elapsed)
+    {
+        phasesOpen = EditorGUILayout.Foldout(phasesOpen, "Phase Setup", true);
+        if (phasesOpen)
+        {
+            EditorGUILayout.LabelField("Global start seconds. P1 starts at 0. Changing boundaries never moves attacks.", EditorStyles.wordWrappedMiniLabel);
+            using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
+            {
+                EditorGUILayout.PropertyField(data.FindProperty("phase2Start"), new GUIContent("P2 Start (global s)"));
+                EditorGUILayout.PropertyField(data.FindProperty("phase3Start"), new GUIContent("P3 Start (global s)"));
+            }
+        }
+        phase2Start = data.FindProperty("phase2Start").floatValue;
+        phase3Start = data.FindProperty("phase3Start").floatValue;
+        fullDuration = data.FindProperty("duration").floatValue;
+        string error = AttackTimelineTimeView.BoundaryError(phase2Start, phase3Start);
+        using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
+        {
+            GUILayout.Label("Time View", GUILayout.Width(65));
+            for (int i = 0; i < 4; i++)
+            {
+                bool available = i == 0 || (error == null && AttackTimelineTimeView.Offset(i, phase2Start, phase3Start) < fullDuration);
+                using (new EditorGUI.DisabledScope(!available))
+                    if (GUILayout.Toggle(timeView == i, i == 0 ? "Global" : "P" + i, EditorStyles.toolbarButton) && timeView != i)
+                    { timeView = i; GUI.FocusControl(null); overviewScroll = detailScroll = Vector2.zero; }
+            }
+        }
+        if (timeView < 0 || timeView > 3 || error != null || AttackTimelineTimeView.Offset(timeView, phase2Start, phase3Start) >= fullDuration)
+            timeView = 0;
+        viewStart = AttackTimelineTimeView.Offset(timeView, phase2Start, phase3Start);
+        viewEnd = timeView == 1 ? Mathf.Min(phase2Start, fullDuration)
+            : timeView == 2 ? Mathf.Min(phase3Start, fullDuration) : fullDuration;
+        if (error != null) EditorGUILayout.HelpBox(error + " Using Global view; playback timing is unchanged.", MessageType.Warning);
+        if (timeView != 0)
+            EditorGUILayout.LabelField(ViewName + " 0s = Global " + GlobalLabel(viewStart)
+                + ". Fields use " + ViewName + " seconds; negative values are before this phase.", EditorStyles.wordWrappedMiniLabel);
+        if (error == null)
+        {
+            int phase = AttackTimelineTimeView.PhaseAt(elapsed, phase2Start, phase3Start);
+            float offset = AttackTimelineTimeView.Offset(phase, phase2Start, phase3Start);
+            EditorGUILayout.LabelField("Playback: P" + phase + " " + Seconds(elapsed - offset) + "s"
+                + " | Global " + GlobalLabel(elapsed), EditorStyles.miniLabel);
+        }
+    }
+
+    private float TimeValue(float global, string label, string tip = null)
+    {
+        EditorGUI.BeginChangeCheck();
+        float local = EditorGUILayout.FloatField(new GUIContent(label, (tip ?? "") + " Input: " + ViewName + " seconds. " + DualTime(global)),
+            AttackTimelineTimeView.ToLocal(global, viewStart));
+        // Do not round-trip untouched values: switching views must not change stored floats.
+        return EditorGUI.EndChangeCheck() ? AttackTimelineTimeView.ToGlobal(local, viewStart) : global;
+    }
+    private void TimeField(SerializedProperty property, string label, string tip = null)
+    {
+        float before = property.floatValue;
+        float after = TimeValue(before, label, tip);
+        if (!before.Equals(after)) property.floatValue = after;
+        EditorGUILayout.LabelField(DualTime(after), EditorStyles.miniLabel);
+    }
 
     private void OnGUI()
     {
@@ -124,13 +203,14 @@ public class AttackTimelineWindow : EditorWindow
             data.Update();
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.LabelField($"{controller.Elapsed:0.0} s", GUILayout.Width(65));
+                EditorGUILayout.LabelField("Global " + GlobalLabel(controller.Elapsed), GUILayout.MinWidth(145));
                 using (new EditorGUI.DisabledScope(EditorApplication.isPlaying))
                 {
                     EditorGUILayout.LabelField("Duration (s)", GUILayout.Width(78));
                     EditorGUILayout.PropertyField(data.FindProperty("duration"), GUIContent.none);
                 }
             }
+            DrawTimeView(data, controller.Elapsed);
             DrawRangeTest(controller);
             setupOpen = EditorGUILayout.Foldout(setupOpen, "Scene Setup", true);
             if (setupOpen)
@@ -200,22 +280,30 @@ public class AttackTimelineWindow : EditorWindow
         EditorGUILayout.LabelField("Emitter Tracks", EditorStyles.boldLabel);
         var rows = new List<Row>();
         for (int t = 0; t < tracks.arraySize; t++)
-            rows.Add(new Row { track = t, time = P(tracks.GetArrayElementAtIndex(t), "appearAt").floatValue });
+        {
+            var track = tracks.GetArrayElementAtIndex(t);
+            float appear = P(track, "appearAt").floatValue;
+            if (timeView == 0 || AttackTimelineTimeView.Overlaps(appear, P(track, "stopAt").floatValue, viewStart, viewEnd))
+                rows.Add(new Row { track = t, time = appear });
+        }
+        if (!rows.Exists(row => row.track == selectedTrack)) selectedTrack = rows.Count == 0 ? -1 : rows[0].track;
+        if (timeView != 0)
+            EditorGUILayout.LabelField("Showing tracks active in " + ViewName + ". Cross-phase tracks keep their full attack lists. G = Global.", EditorStyles.wordWrappedMiniLabel);
         rows.Sort((a, b) => a.time != b.time ? a.time.CompareTo(b.time) : a.track.CompareTo(b.track));
         var sizing = wide ? new[] { GUILayout.MinHeight(120), GUILayout.ExpandHeight(true) }
             : new[] { GUILayout.Height(Mathf.Clamp(position.height * .28f, 135, 260)) };
         overviewScroll = EditorGUILayout.BeginScrollView(overviewScroll, sizing);
-        using (new EditorGUILayout.VerticalScope(GUILayout.MinWidth(840)))
+        using (new EditorGUILayout.VerticalScope(GUILayout.MinWidth(1120)))
         {
             using (new EditorGUILayout.HorizontalScope(EditorStyles.toolbar))
             {
                 Cell("On", 25); Cell("Track", 130); Cell("Emitter", 130); Cell("Count", 42);
-                Cell("Placement", 125); Cell("Appear", 52); Cell("Attack Times", 145); Cell("Stop", 52);
+                Cell("Placement", 125); Cell("Appear", 130); Cell("Attack Times", 250); Cell("Stop", 130);
             }
             foreach (Row row in rows)
             {
                 var track = tracks.GetArrayElementAtIndex(row.track);
-                Rect rect = EditorGUILayout.GetControlRect(false, 24, GUILayout.MinWidth(840));
+                Rect rect = EditorGUILayout.GetControlRect(false, 24, GUILayout.MinWidth(1120));
                 if (row.track == selectedTrack) EditorGUI.DrawRect(rect, new Color(.20f, .45f, .72f, .3f));
                 if (Event.current.type == EventType.MouseDown && Event.current.button == 0 && rect.Contains(Event.current.mousePosition))
                 {
@@ -236,9 +324,9 @@ public class AttackTimelineWindow : EditorWindow
                     RowCell(ref x, rect, template != null ? template.name : "Not assigned", 130);
                     RowCell(ref x, rect, P(track, "placementMode").enumValueIndex == 2 ? P(track, "emitterCount").intValue.ToString() : "1", 42);
                     RowCell(ref x, rect, PlacementSummary(track), 125);
-                    RowCell(ref x, rect, Seconds(row.time), 52);
-                    RowCell(ref x, rect, TimesSummary(P(track, "attackTimes")), 145);
-                    RowCell(ref x, rect, Seconds(P(track, "stopAt").floatValue), 52);
+                    RowCell(ref x, rect, TableTime(row.time), 130, DualTime(row.time));
+                    RowCell(ref x, rect, TimesSummary(P(track, "attackTimes")), 250, TimesSummary(P(track, "attackTimes"), true));
+                    RowCell(ref x, rect, TableTime(P(track, "stopAt").floatValue), 130, DualTime(P(track, "stopAt").floatValue));
                 }
             }
         }
@@ -260,16 +348,15 @@ public class AttackTimelineWindow : EditorWindow
         if (mode == 2) return "Random: " + P(clip, "region").enumDisplayNames[P(clip, "region").enumValueIndex];
         return "Custom";
     }
-    private static string TimesSummary(SerializedProperty times)
+    private string TimesSummary(SerializedProperty times, bool detailed = false)
     {
         var values = new List<string>();
-        for (int i = 0; i < times.arraySize; i++) values.Add(Seconds(times.GetArrayElementAtIndex(i).floatValue));
+        for (int i = 0; i < times.arraySize; i++) values.Add(detailed ? DualTime(times.GetArrayElementAtIndex(i).floatValue) : TableTime(times.GetArrayElementAtIndex(i).floatValue));
         return values.Count == 0 ? "-" : string.Join(", ", values);
     }
 
     private void DrawDetails(SerializedProperty tracks, SerializedObject data, AttackTimelineController controller)
     {
-        ClampSelection(tracks);
         EditorGUILayout.LabelField("Selected Emitter Track", EditorStyles.boldLabel);
         detailScroll = EditorGUILayout.BeginScrollView(detailScroll);
         if (selectedTrack >= 0)
@@ -291,9 +378,17 @@ public class AttackTimelineWindow : EditorWindow
                     Field(track, "rotationZ", "Rotation Z");
                 }
                 EditorGUILayout.Space(4);
-                Field(track, "appearAt", "Appear At (s)");
+                Field(track, "reenterPerAttack", "Reenter Per Attack", "Each Attack Time starts one appearance and one burst. Finish the burst, exit, then enter again. Random Points excludes the previous wave's points.");
+                bool reenter = P(track, "reenterPerAttack").boolValue;
+                if (reenter)
+                    EditorGUILayout.HelpBox(mode == 2
+                        ? "Each attack: new random points, one burst, then exit. Previous points are excluded. Later entries start before Attack Time by Enter Duration."
+                        : "Each attack: enter at the same configured position, one burst, then exit. Use Random Points to change position.", MessageType.None);
+                TimeField(P(track, "appearAt"), reenter ? "First Appear At (s)" : "Appear At (s)");
                 DrawAttackTimes(track);
-                Field(track, "stopAt", "Stop At (s)", "Stop starting new attacks; active preparation / lasers finish before exit.");
+                TimeField(P(track, "stopAt"), "Stop At (s)", reenter
+                    ? "Track cutoff. Each wave exits after its burst and active preparation / laser finish; it does not wait for Stop At."
+                    : "Stop starting new attacks; active preparation / lasers finish before exit.");
                 EditorGUILayout.Space(4);
                 AttackSettingsGUI.Draw(P(track, "attack"), template, true, false);
                 motionOpen = EditorGUILayout.Foldout(motionOpen, "Entry / Exit", true);
@@ -303,7 +398,7 @@ public class AttackTimelineWindow : EditorWindow
                     Field(track, "enterDuration", "Enter Duration (s)");
                     Field(track, "exitDuration", "Exit Duration (s)");
                 }
-                timingOpen = EditorGUILayout.Foldout(timingOpen, "Timing Preview / Excel", true);
+                timingOpen = EditorGUILayout.Foldout(timingOpen, "Timing Preview / Excel (Global)", true);
                 if (timingOpen) AttackTimingPreview.Draw(track, template);
                 else if (P(track, "enabled").boolValue) AttackTimingPreview.DrawWarnings(track, template);
                 using (new EditorGUILayout.HorizontalScope())
@@ -364,12 +459,12 @@ public class AttackTimelineWindow : EditorWindow
         Field(clip, "minSpacing", "Min Spacing", "Minimum distance in world units. Includes other reserved points; the larger spacing applies.");
         randomOpen = EditorGUILayout.Foldout(randomOpen, "Random Options", true);
         if (!randomOpen) return;
-        Field(clip, "randomSeed", "Seed", "Same seed and available points reproduce the same selection. Points are selected once per track, on entry.");
+        Field(clip, "randomSeed", "Seed", "Same seed and available points reproduce the same selection. Reenter Per Attack changes the seed per wave and excludes previous-wave points.");
         using (new EditorGUILayout.HorizontalScope())
         {
             if (GUILayout.Button("New Seed")) P(clip, "randomSeed").intValue = Guid.NewGuid().GetHashCode();
             using (new EditorGUI.DisabledScope(library == null))
-                if (GUILayout.Button(new GUIContent("Preview Points", "Empty-scene preview. Runtime occupancy can change the selection.")))
+                if (GUILayout.Button(new GUIContent("Preview Points", "First-wave empty-scene preview. Later waves exclude previous points. Runtime occupancy can change the selection.")))
                 {
                     try
                     {
@@ -384,14 +479,15 @@ public class AttackTimelineWindow : EditorWindow
         if (!string.IsNullOrEmpty(pointPreview)) EditorGUILayout.HelpBox(pointPreview, MessageType.Info);
     }
 
-    private static void DrawAttackTimes(SerializedProperty clip)
+    private void DrawAttackTimes(SerializedProperty clip)
     {
         var times = P(clip, "attackTimes");
-        EditorGUILayout.LabelField(new GUIContent("Attack Times (s)", "Absolute loop seconds when preparation begins, not when bullets leave the emitter. Each time starts one burst."));
+        EditorGUILayout.LabelField(new GUIContent("Attack Times (s)", "Preparation start in the selected time view, not when bullets leave the emitter. Each time starts one burst. Stored as global seconds."));
         for (int i = 0; i < times.arraySize; i++)
             using (new EditorGUILayout.HorizontalScope())
             {
-                EditorGUILayout.PropertyField(times.GetArrayElementAtIndex(i), GUIContent.none);
+                using (new EditorGUILayout.VerticalScope())
+                    TimeField(times.GetArrayElementAtIndex(i), "Attack " + (i + 1) + " (s)");
                 if (GUILayout.Button(new GUIContent("-", "Remove this attack time"), GUILayout.Width(24)))
                 { times.DeleteArrayElementAtIndex(i); break; }
             }
@@ -399,6 +495,7 @@ public class AttackTimelineWindow : EditorWindow
         {
             float next = times.arraySize == 0 ? P(clip, "appearAt").floatValue + P(clip, "enterDuration").floatValue
                 : times.GetArrayElementAtIndex(times.arraySize - 1).floatValue + 1;
+            if (timeView != 0) next = Mathf.Max(viewStart, next);
             int index = times.arraySize++; times.GetArrayElementAtIndex(index).floatValue = next;
         }
     }
@@ -409,8 +506,9 @@ public class AttackTimelineWindow : EditorWindow
         var clip = tracks.GetArrayElementAtIndex(selectedTrack);
         P(clip, "label").stringValue = UniqueName(tracks, selectedTrack, "New Track");
         P(clip, "enabled").boolValue = true;
+        P(clip, "reenterPerAttack").boolValue = false;
         P(clip, "emitterTemplate").objectReferenceValue = null;
-        float start = 0;
+        float start = viewStart;
         P(clip, "appearAt").floatValue = start; P(clip, "stopAt").floatValue = duration;
         P(clip, "position").vector3Value = Vector3.zero; P(clip, "rotationZ").floatValue = 0;
         P(clip, "entrySide").enumValueIndex = 0;
@@ -429,9 +527,32 @@ public class AttackTimelineWindow : EditorWindow
         if (!EditorApplication.isPlaying) return;
         debugOpen = EditorGUILayout.Foldout(debugOpen, "Diagnostics", true);
         if (!debugOpen) return;
+        EditorGUILayout.LabelField("Log times use Global seconds.", EditorStyles.miniLabel);
         EditorGUILayout.LabelField("Reserved Points", controller.ReservedPointCount.ToString());
         for (int i = Mathf.Max(0, controller.AttackLog.Count - 4); i < controller.AttackLog.Count; i++)
             EditorGUILayout.LabelField(controller.AttackLog[i], EditorStyles.wordWrappedMiniLabel);
         if (GUILayout.Button("Copy Log")) EditorGUIUtility.systemCopyBuffer = string.Join("\n", controller.AttackLog);
+    }
+}
+
+// Pure display conversion. Never writes to tracks, phase boundaries, or runtime clocks.
+public static class AttackTimelineTimeView
+{
+    public static float Offset(int view, float p2, float p3) => view == 2 ? p2 : view == 3 ? p3 : 0;
+    public static float ToLocal(float global, float offset) => global - offset;
+    public static float ToGlobal(float local, float offset) => local + offset;
+    public static int PhaseAt(float global, float p2, float p3) => global >= p3 ? 3 : global >= p2 ? 2 : 1;
+    public static bool Overlaps(float appear, float stop, float from, float to) => appear < to && stop > from;
+    public static string BoundaryError(float p2, float p3)
+        => float.IsNaN(p2) || float.IsInfinity(p2) || float.IsNaN(p3) || float.IsInfinity(p3) || p2 <= 0 || p3 <= p2
+            ? "Phase starts must be finite and ordered: 0 < P2 < P3." : null;
+    public static string Clock(float seconds)
+    {
+        if (float.IsNaN(seconds) || float.IsInfinity(seconds)) return "--:--";
+        double rounded = Math.Round(Math.Abs((double)seconds), 2, MidpointRounding.AwayFromZero);
+        double minutes = Math.Floor(rounded / 60);
+        double remainder = rounded - minutes * 60;
+        return (seconds < 0 && rounded > 0 ? "-" : "") + minutes.ToString("0", System.Globalization.CultureInfo.InvariantCulture)
+            + ":" + remainder.ToString("00.##", System.Globalization.CultureInfo.InvariantCulture);
     }
 }

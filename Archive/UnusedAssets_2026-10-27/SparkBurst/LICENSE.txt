@@ -1,0 +1,4 @@
+Spark Sheet free output samples — Single Clip Studio
+Four procedural sprite sheets generated from seed paperclip. PNG backgrounds are transparent. Each sheet has16frames,64x64cells,8columns,12FPS. JSON records rectangles and durations. Burst/ring/sparkle are one-shot;trail visibly restarts.
+Use, modify and incorporate these output samples in personal and commercial projects. Attribution optional. Do not claim exclusive rights or original authorship of unchanged samples. AI assisted the original generator code;no third-party artwork.
+These samples contain outputs only, not the paid generator source.

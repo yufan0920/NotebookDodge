@@ -87,6 +87,7 @@ MonoBehaviour:
   drawSpeed: 100
   initialLength: 0.6
   beamWidth: 0.5
+  damageWidth: 0.5
   beamColor: {r: 1, g: 0.8269428, b: 0.10196078, a: 0.65}
   damage: 1
   damageInterval: 0.5

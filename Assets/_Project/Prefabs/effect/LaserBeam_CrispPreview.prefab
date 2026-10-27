@@ -1,0 +1,119 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5673606285328393326
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 636337780090441646}
+  - component: {fileID: 4680034347202167125}
+  - component: {fileID: 918281762300389691}
+  m_Layer: 0
+  m_Name: LaserBeam_CrispPreview
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &636337780090441646
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5673606285328393326}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4680034347202167125
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5673606285328393326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 69a9d089154f3d745a5c30e3c0360a4c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  warningDuration: 2
+  warningWidth: 0.045
+  warningColor: {r: 0.754717, g: 0.26820347, b: 0.16731933, a: 0.85}
+  chargeDuration: 1.5
+  chargeAdvanceDistance: 0.3
+  accelerationDuration: 0.12
+  speedCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0.02
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.65
+      value: 0.05
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  beamLength: 20
+  drawSpeed: 100
+  initialLength: 0.6
+  beamWidth: 0.5
+  beamColor: {r: 0.972549, g: 0.49111986, b: 0.34509805, a: 0.65}
+  damageWidth: 0.2
+  damage: 1
+  damageInterval: 0.5
+  holdDuration: 1.5
+  fadeDuration: 0.2
+  sortingOrder: 10
+  hideBuiltInBeamVisual: 1
+--- !u!114 &918281762300389691
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5673606285328393326}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78f8d4ef0bf9467787810fd4d4ef5490, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sheet: {fileID: 2800000, guid: a7723ada00924442ac12b54435330da0, type: 3}
+  frameCount: 16
+  columns: 8
+  cellSize: 192
+  framesPerSecond: 30
+  sustainFirstFrame: 4
+  sustainLastFrame: 6
+  lineFillOfCell: 0.44
+  opacity: 1

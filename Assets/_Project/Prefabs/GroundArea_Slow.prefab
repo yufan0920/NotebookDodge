@@ -51,5 +51,5 @@ MonoBehaviour:
   damageInterval: 1
   slowEnabled: 1
   speedMultiplier: 0.3
-  areaColor: {r: 0.2, g: 0.3, b: 0.8, a: 0.35}
+  areaColor: {r: 0.2901961, g: 0.5568628, b: 0.86274517, a: 0.47058824}
   sortingOrder: -10

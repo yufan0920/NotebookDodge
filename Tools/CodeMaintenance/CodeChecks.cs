@@ -143,12 +143,35 @@ internal static class CodeChecks
         }
     }
 
+    private static void BattleViewport()
+    {
+        foreach (Vector2 screen in new[] { new Vector2(1920, 1080), new Vector2(1280, 720),
+            new Vector2(2560, 1080), new Vector2(1024, 768), new Vector2(720, 1280) })
+        foreach (float header in new[] { 0f, 72f, 216f })
+        {
+            Rect view = BattleHudLayout.CalculateViewport(screen.x, screen.y, header);
+            Near(view.xMin, 0, "battle view reaches left screen edge");
+            Near(view.xMax, 1, "battle view reaches right screen edge");
+            Near(view.yMin, 0, "battle view reaches bottom screen edge");
+            Near(view.yMax, 1 - header / 1080f, "battle view stops at HUD");
+            float height = view.height * screen.y;
+            float aspect = screen.x / height;
+            float size = BattleHudLayout.CalculateOrthographicSize(aspect, 5);
+            float oldFittedHeight = Mathf.Min(height, screen.x * 9f / 16f);
+            Require(Math.Abs(height / (2 * size) - oldFittedHeight / 10f) < 0.0001f,
+                "paper and player retain their original pixels per world unit");
+        }
+        float edge = BattleHudLayout.CalculateOrthographicSize(1920f / 1008f, 5) * 1920f / 1008f;
+        Require(edge > 9.2f, "side emitter beyond old 16:9 edge is now visible");
+    }
+
     public static void Main()
     {
         SheetCoordinates();
         Playback();
         Scheduling();
         LaserDamageWidth();
-        Console.WriteLine(assertions + " regression assertions passed (UVs, fades, laser sustain/width, scheduling and P3).");
+        BattleViewport();
+        Console.WriteLine(assertions + " regression assertions passed (UVs, fades, laser sustain/width, scheduling, P3 and battle viewport).");
     }
 }

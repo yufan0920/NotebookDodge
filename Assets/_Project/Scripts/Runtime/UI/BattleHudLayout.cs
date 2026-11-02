@@ -1,11 +1,13 @@
 using UnityEngine;
 
-// A full, uncropped 16:9 camera view below an independent overlay HUD.
+// Keep the original 16:9 composition and reveal extra world space around it.
 [ExecuteAlways, DisallowMultipleComponent, RequireComponent(typeof(Camera))]
 public class BattleHudLayout : MonoBehaviour
 {
-    [Tooltip("Header height at 1080p. Scales with screen height while the battle view keeps its 16:9 aspect ratio.")]
+    [Tooltip("Header height at 1080p. The camera renders the entire area below this bar.")]
     [SerializeField, Range(0, 216)] private float headerHeight = 72;
+    [Tooltip("Camera size for the original 16:9 composition. Extra screen space reveals more of the world without stretching it.")]
+    [SerializeField, Min(0.01f)] private float referenceOrthographicSize = 5;
     [SerializeField] private RectTransform header;
     [Tooltip("Renders bg1 across the screen underneath the battle camera and HUD.")]
     [SerializeField] private Camera deskCamera;
@@ -13,12 +15,14 @@ public class BattleHudLayout : MonoBehaviour
     private Camera battleCamera;
     private Rect previousRect;
     private float previousAspect;
+    private float previousOrthographicSize;
 
     private void OnEnable()
     {
         battleCamera = GetComponent<Camera>();
         previousRect = battleCamera.rect;
         previousAspect = battleCamera.aspect;
+        previousOrthographicSize = battleCamera.orthographicSize;
         ApplyLayout();
     }
 
@@ -29,10 +33,13 @@ public class BattleHudLayout : MonoBehaviour
     {
         width = Mathf.Max(1, width); height = Mathf.Max(1, height);
         float availableHeight = height * (1 - Mathf.Clamp(headerPixels, 0, 216) / 1080f);
-        float viewHeight = Mathf.Min(availableHeight, width * 9f / 16f);
-        float viewWidth = viewHeight * 16f / 9f;
-        return new Rect((width - viewWidth) / (2 * width), (availableHeight - viewHeight) / (2 * height),
-            viewWidth / width, viewHeight / height);
+        return new Rect(0, 0, 1, availableHeight / height);
+    }
+
+    public static float CalculateOrthographicSize(float aspect, float referenceSize)
+    {
+        // On narrow screens retain the original composition's width as well.
+        return Mathf.Max(0.01f, referenceSize) * Mathf.Max(1, (16f / 9f) / Mathf.Max(0.001f, aspect));
     }
 
     private void ApplyLayout()
@@ -40,7 +47,10 @@ public class BattleHudLayout : MonoBehaviour
         if (battleCamera == null) return;
         Rect view = CalculateViewport(Screen.width, Screen.height, headerHeight);
         battleCamera.rect = view;
-        battleCamera.aspect = 16f / 9f;
+        float battleAspect = Mathf.Max(1, Screen.width) * view.width /
+            (Mathf.Max(1, Screen.height) * view.height);
+        battleCamera.aspect = battleAspect;
+        battleCamera.orthographicSize = CalculateOrthographicSize(battleAspect, referenceOrthographicSize);
         float headerBottom = 1 - Mathf.Clamp(headerHeight, 0, 216) / 1080f;
         Place(header, 0, headerBottom, 1, 1);
         if (deskCamera != null && deskBackground != null && deskBackground.sprite != null)
@@ -72,5 +82,6 @@ public class BattleHudLayout : MonoBehaviour
         if (battleCamera == null) return;
         battleCamera.rect = previousRect;
         battleCamera.aspect = previousAspect;
+        battleCamera.orthographicSize = previousOrthographicSize;
     }
 }

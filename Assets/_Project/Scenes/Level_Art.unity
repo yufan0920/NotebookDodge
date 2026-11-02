@@ -375,7 +375,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: '! NEW RECORD !'
+  m_text: NEW RECORD !
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: de50e94154c73ac4da9227b75250f9b5, type: 2}
   m_sharedMaterial: {fileID: 6621607070397696893, guid: de50e94154c73ac4da9227b75250f9b5, type: 2}
@@ -624,9 +624,9 @@ Camera:
   m_FocalLength: 50
   m_NormalizedViewPortRect:
     serializedVersion: 2
-    x: 0.033628944
+    x: 0
     y: 0
-    width: 0.9327421
+    width: 1
     height: 0.93333334
   near clip plane: 0.3
   far clip plane: 1000
@@ -4186,11 +4186,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba47ecd9b879ff347bd3c21037124252, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  bottomLeft: {x: -5.55, y: -3.74}
-  bottomRight: {x: 5.54, y: -3.71}
-  topRight: {x: 5, y: 3.48}
-  topLeft: {x: -5.1, y: 3.49}
-  showBoundary: 1
+  bottomLeft: {x: -5.62, y: -3.75}
+  bottomRight: {x: 5.52, y: -3.75}
+  topRight: {x: 4.9, y: 3.48}
+  topLeft: {x: -5.12, y: 3.49}
+  showBoundary: 0
   boundaryColor: {r: 0, g: 1, b: 0, a: 1}
   boundaryWidth: 0.035
   boundarySortingOrder: 100
@@ -5208,6 +5208,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   headerHeight: 72
+  referenceOrthographicSize: 5
   header: {fileID: 1999000011}
   deskCamera: {fileID: 1999000062}
   deskBackground: {fileID: 1247068496}
@@ -5348,7 +5349,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 5.018819
+  orthographic size: 5.0193157
   m_Depth: -2
   m_CullingMask:
     serializedVersion: 2

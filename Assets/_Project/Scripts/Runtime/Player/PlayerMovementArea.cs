@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections.Generic;
 
 public class PlayerMovementArea : MonoBehaviour
 {
@@ -14,6 +15,8 @@ public class PlayerMovementArea : MonoBehaviour
     private bool warned;
     private LineRenderer boundary;
     private Material boundaryMaterial;
+    private readonly List<Vector2> inset = new List<Vector2>(8);
+    private readonly List<Vector2> scratch = new List<Vector2>(8);
 
     private void LateUpdate()
     {
@@ -57,6 +60,9 @@ public class PlayerMovementArea : MonoBehaviour
     }
 
     public bool TryConstrain(Vector2 position, out Vector2 constrained)
+        => TryConstrain(position, 0, out constrained);
+
+    public bool TryConstrain(Vector2 position, float padding, out Vector2 constrained)
     {
         constrained = position;
         GetCorners();
@@ -74,14 +80,16 @@ public class PlayerMovementArea : MonoBehaviour
             winding = turn;
         }
         warned = false;
+        if (!BuildInset(corners, padding, inset, scratch)) return false;
         bool inside = true;
         float bestDistance = float.PositiveInfinity;
         Vector2 closest = position;
-        for (int i = 0; i < 4; i++)
+        for (int i = 0; i < inset.Count; i++)
         {
-            Vector2 a = corners[i];
-            Vector2 edge = corners[(i + 1) % 4] - a;
+            Vector2 a = inset[i];
+            Vector2 edge = inset[(i + 1) % inset.Count] - a;
             if (Cross(edge, position - a) * winding < 0) inside = false;
+            if (edge.sqrMagnitude < 1e-12f) continue;
             float t = Mathf.Clamp01(Vector2.Dot(position - a, edge) / edge.sqrMagnitude);
             Vector2 candidate = a + edge * t;
             float distance = (candidate - position).sqrMagnitude;
@@ -89,6 +97,38 @@ public class PlayerMovementArea : MonoBehaviour
         }
         constrained = inside ? position : closest;
         return true;
+    }
+
+    // Clip against inward-offset edges in world units. Unlike scaling, this
+    // keeps the same clearance at slanted sides and their intersections.
+    internal static bool BuildInset(Vector2[] boundary, float padding,
+        List<Vector2> result, List<Vector2> buffer)
+    {
+        result.Clear();
+        if (float.IsNaN(padding) || float.IsInfinity(padding)) return false;
+        padding = Mathf.Max(0, padding);
+        result.AddRange(boundary);
+        float winding = Cross(boundary[1] - boundary[0], boundary[2] - boundary[1]);
+        for (int i = 0; i < boundary.Length && result.Count > 0; i++)
+        {
+            Vector2 origin = boundary[i];
+            Vector2 edge = boundary[(i + 1) % boundary.Length] - origin;
+            Vector2 normal = new Vector2(-edge.y, edge.x).normalized * Mathf.Sign(winding);
+            buffer.Clear();
+            for (int j = 0; j < result.Count; j++)
+            {
+                Vector2 a = result[j], b = result[(j + 1) % result.Count];
+                float da = Vector2.Dot(a - origin, normal) - padding;
+                float db = Vector2.Dot(b - origin, normal) - padding;
+                if (da >= 0) buffer.Add(a);
+                if ((da >= 0) != (db >= 0)) buffer.Add(Vector2.Lerp(a, b, da / (da - db)));
+            }
+            result.Clear();
+            result.AddRange(buffer);
+        }
+        float area = 0;
+        for (int i = 0; i < result.Count; i++) area += Cross(result[i], result[(i + 1) % result.Count]);
+        return result.Count >= 3 && Mathf.Abs(area) > 0.000001f;
     }
 
     private static float Cross(Vector2 a, Vector2 b) => a.x * b.y - a.y * b.x;

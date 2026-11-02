@@ -158,7 +158,11 @@
 | [GameOverUI.cs](../Assets/_Project/Scripts/Runtime/UI/GameOverUI.cs) | 死亡结算、最高分和本机存档。 |
 | [HealthBarUI.cs](../Assets/_Project/Scripts/Runtime/UI/HealthBarUI.cs) | 订阅生命事件，更新图标设置并兼容旧血条对象。 |
 | [HeartHealthGraphic.cs](../Assets/_Project/Scripts/Runtime/UI/HeartHealthGraphic.cs) | 实际绘制离散血量图标，不处理伤害。 |
+| [NewRecordConfetti.cs](../Assets/_Project/Scripts/Runtime/UI/NewRecordConfetti.cs) | 新纪录结算的彩带序列动画，使用不受暂停影响的时间，播放后淡出；由 GameOverUI 触发。 |
 | [SurvivalTimerUI.cs](../Assets/_Project/Scripts/Runtime/UI/SurvivalTimerUI.cs) | 显示时间与实际存活计分；支持时间轴区间测试。 |
+| [BattleHudLayout.cs](../Assets/_Project/Scripts/Runtime/UI/BattleHudLayout.cs) | 顶部信息栏与固定 16:9 战斗视口；独立背景相机让 bg1 等比铺满屏幕。 |
+
+`Level_Art` 的 bg1 使用 `DeskBackground` Layer，由 `Main Camera/Desk Background Camera` 单独绘制。主相机排除该层并只清除深度，叠加白纸、玩家和攻击；Canvas 最后绘制信息栏。调整桌面时保留这组相机与 Layer 引用。
 
 ### Runtime/VFX
 

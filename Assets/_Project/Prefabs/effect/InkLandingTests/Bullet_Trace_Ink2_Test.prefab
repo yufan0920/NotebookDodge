@@ -199,7 +199,7 @@ MonoBehaviour:
   sideOffset: {x: 0.03, y: 0.07}
   opacity: 0.8
   matchBulletColor: 0
-  tint: {r: 0.8584906, g: 0.6424272, b: 0.125534, a: 1}
+  tint: {r: 0.2858446, g: 0.5471698, b: 0.19873619, a: 1}
   colorLightening: 0
 --- !u!114 &918281762300389696
 MonoBehaviour:

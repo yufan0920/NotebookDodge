@@ -11,11 +11,23 @@ public class GameOverUI : MonoBehaviour
     [SerializeField] private TextMeshProUGUI bestScoreText;
     // 独立的新纪录文字，位置、字号和颜色由 Inspector 控制。
     [SerializeField] private TextMeshProUGUI newRecordText;
+    [SerializeField] private NewRecordConfetti newRecordConfetti;
 
     // 固定的存档键名。以后改变计分规则时可换版本号，避免混用旧成绩。
     private const string BestScoreKey = "NotebookDodge.BestSurvivalScore.v1";
     private bool initialized;
     private bool resultShown;
+
+    [ContextMenu("Reset Best Score")]
+    private void ResetBestScore()
+    {
+        PlayerPrefs.DeleteKey(BestScoreKey);
+        PlayerPrefs.Save();
+        if (bestScoreText != null) bestScoreText.text = "BEST  0";
+        if (newRecordText != null) newRecordText.gameObject.SetActive(false);
+        if (newRecordConfetti != null) newRecordConfetti.Stop();
+        Debug.Log("Best score reset to 0.", this);
+    }
 
     private void Start()
     {
@@ -68,6 +80,11 @@ public class GameOverUI : MonoBehaviour
             newRecordText.gameObject.SetActive(newRecord);
         }
         gameOverPanel.SetActive(true);
+        if (newRecordConfetti != null)
+        {
+            if (newRecord) newRecordConfetti.Play();
+            else newRecordConfetti.Stop();
+        }
     }
 
     private void OnEnable()
@@ -80,5 +97,6 @@ public class GameOverUI : MonoBehaviour
     private void OnDisable()
     {
         if (player != null) player.HealthChanged -= OnHealthChanged;
+        if (newRecordConfetti != null) newRecordConfetti.Stop();
     }
 }

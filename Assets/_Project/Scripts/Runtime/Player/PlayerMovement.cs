@@ -6,6 +6,9 @@ public class PlayerMovement : MonoBehaviour
 {
     [SerializeField, Min(0f)] private float speed = 4f;
     [SerializeField] private PlayerMovementArea movementArea;
+    [Tooltip("World-space clearance for the player center from each boundary edge. Does not change Bounce or Laser boundaries.")]
+    [SerializeField, Min(0f)] private float boundaryPadding = 0.3f;
+    private bool warnedPadding;
     // Bounds describe the allowed position of the player's CENTER.
     [SerializeField] private Vector2 minPosition = new Vector2(-7.5f, -4f);
     [SerializeField] private Vector2 maxPosition = new Vector2(7.5f, 4f);
@@ -39,13 +42,24 @@ public class PlayerMovement : MonoBehaviour
         float areaMultiplier = GroundArea.GetSpeedMultiplier(health, body.position);
         Vector2 next = body.position + input * speed * areaMultiplier * Time.fixedDeltaTime;
         Vector2 constrained;
-        if (movementArea != null && movementArea.isActiveAndEnabled &&
-            movementArea.TryConstrain(next, out constrained))
+        if (movementArea != null && movementArea.isActiveAndEnabled)
+        {
+            if (!movementArea.TryConstrain(next, boundaryPadding, out constrained))
+            {
+                if (!warnedPadding) Debug.LogWarning("Player cannot move: check Movement Area and reduce Boundary Padding if the inset area is empty.", this);
+                warnedPadding = true;
+                return;
+            }
+            warnedPadding = false;
             next = constrained;
+        }
         else
         {
-            next.x = Mathf.Clamp(next.x, minPosition.x, maxPosition.x);
-            next.y = Mathf.Clamp(next.y, minPosition.y, maxPosition.y);
+            float padding = float.IsNaN(boundaryPadding) || float.IsInfinity(boundaryPadding) ? 0 : Mathf.Max(0, boundaryPadding);
+            Vector2 low = minPosition + Vector2.one * padding;
+            Vector2 high = maxPosition - Vector2.one * padding;
+            next.x = low.x <= high.x ? Mathf.Clamp(next.x, low.x, high.x) : (minPosition.x + maxPosition.x) / 2;
+            next.y = low.y <= high.y ? Mathf.Clamp(next.y, low.y, high.y) : (minPosition.y + maxPosition.y) / 2;
         }
         body.MovePosition(next);
     }

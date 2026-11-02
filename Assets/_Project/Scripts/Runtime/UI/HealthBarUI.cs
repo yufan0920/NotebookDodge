@@ -9,6 +9,8 @@ public class HealthBarUI : MonoBehaviour
     [Header("Health Icons")]
     [Tooltip("Optional heart artwork. Leave empty to display dots.")]
     [SerializeField] private Sprite iconSprite;
+    [Tooltip("Optional empty-heart artwork. Uses separate UI images when both sprites are assigned.")]
+    [SerializeField] private Sprite emptyIconSprite;
     [SerializeField, Min(12f)] private float heartSize = 32f;
     [SerializeField, Min(0f)] private float spacing = 8f;
     [SerializeField, Range(1, 20)] private int heartsPerRow = 10;
@@ -62,7 +64,7 @@ public class HealthBarUI : MonoBehaviour
     {
         if (!EnsureHealthGraphic()) return;
         hearts.Configure(current, maximum, heartSize, spacing, heartsPerRow,
-            filledColor, outlineColor, emptyColor, iconSprite);
+            filledColor, outlineColor, emptyColor, iconSprite, emptyIconSprite);
     }
 
     private bool EnsureHealthGraphic()

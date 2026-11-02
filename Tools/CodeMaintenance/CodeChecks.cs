@@ -167,11 +167,21 @@ internal static class CodeChecks
 
     public static void Main()
     {
+        Near(UiTransition.Ease(-1), 0, "fade clamps before start");
+        Near(UiTransition.Ease(2), 1, "fade clamps after end");
+        Near(UiTransition.Ease(0.5f), 0.5f, "fade midpoint");
+        float lastOpacity = 0;
+        for (int step = 0; step <= 20; step++)
+        {
+            float opacity = UiTransition.Ease(step / 20f);
+            Require(opacity >= lastOpacity && opacity <= 1, "fade opacity progresses without overshoot");
+            lastOpacity = opacity;
+        }
         SheetCoordinates();
         Playback();
         Scheduling();
         LaserDamageWidth();
         BattleViewport();
-        Console.WriteLine(assertions + " regression assertions passed (UVs, fades, laser sustain/width, scheduling, P3 and battle viewport).");
+        Console.WriteLine(assertions + " regression assertions passed (UVs, UI/VFX fades, laser sustain/width, scheduling, P3 and battle viewport).");
     }
 }

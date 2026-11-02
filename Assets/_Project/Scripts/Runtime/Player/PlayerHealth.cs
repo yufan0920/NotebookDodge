@@ -45,6 +45,7 @@ public class PlayerHealth : MonoBehaviour
             hurtSource.playOnAwake = false;
             hurtSource.spatialBlend = 0f; // 2D 声音，不因摄像机距离而变小。
             hurtSource.loop = false;
+            gameObject.AddComponent<AudioVolumeChannel>().Configure(hurtSource, AudioVolumeChannel.Channel.Effects);
         }
     }
 

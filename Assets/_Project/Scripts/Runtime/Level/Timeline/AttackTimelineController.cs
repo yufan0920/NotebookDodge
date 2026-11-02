@@ -395,7 +395,7 @@ public class AttackTimelineController : MonoBehaviour, ISerializationCallbackRec
 
     private void Update()
     {
-        if (!IsRunning) return;
+        if (!IsRunning || Time.timeScale <= 0) return;
         if (player == null || player.IsDead) { StopAndClear("Player Dead - Cleared"); return; }
         EnsureRepeatSchedules();
         if (!sessionEndless && Elapsed >= TestTo && !ending)

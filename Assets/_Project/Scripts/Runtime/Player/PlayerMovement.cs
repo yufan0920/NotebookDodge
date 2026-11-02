@@ -27,7 +27,7 @@ public class PlayerMovement : MonoBehaviour
     {
         input = Vector2.zero;
         Keyboard keyboard = Keyboard.current;
-        if (keyboard == null || health.IsDead || !Application.isFocused) return;
+        if (keyboard == null || health.IsDead || Time.timeScale <= 0 || !Application.isFocused) return;
         if (keyboard.aKey.isPressed || keyboard.leftArrowKey.isPressed) input.x -= 1;
         if (keyboard.dKey.isPressed || keyboard.rightArrowKey.isPressed) input.x += 1;
         if (keyboard.sKey.isPressed || keyboard.downArrowKey.isPressed) input.y -= 1;

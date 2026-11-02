@@ -125,6 +125,12 @@ public class TraceBullet : MonoBehaviour
         flightTrackingVelocity = Vector2.zero;
         for (float elapsed = 0f; elapsed < trackingTime; elapsed += Time.deltaTime)
         {
+            // Coroutines still resume while paused; do not aim or smooth with a zero time step.
+            if (Time.timeScale <= 0f)
+            {
+                yield return null;
+                continue;
+            }
             if (player == null || player.IsDead)
             {
                 Destroy(gameObject);

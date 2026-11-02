@@ -12,11 +12,36 @@ public class GameOverUI : MonoBehaviour
     // 独立的新纪录文字，位置、字号和颜色由 Inspector 控制。
     [SerializeField] private TextMeshProUGUI newRecordText;
     [SerializeField] private NewRecordConfetti newRecordConfetti;
+    [SerializeField, Min(0)] private float resultFadeSeconds = 0.22f;
 
     // 固定的存档键名。以后改变计分规则时可换版本号，避免混用旧成绩。
     private const string BestScoreKey = "NotebookDodge.BestSurvivalScore.v1";
+    public static int BestScore => Mathf.Max(0, PlayerPrefs.GetInt(BestScoreKey, 0));
     private bool initialized;
     private bool resultShown;
+    private bool leaving;
+    private Coroutine resultFade;
+
+    public void TryAgain()
+    {
+        if (!resultShown || leaving) return;
+        leaving = true;
+        if (!SceneNavigation.Load(gameObject.scene.path, this)) leaving = false;
+    }
+
+    public void MainMenu()
+    {
+        if (!resultShown || leaving) return;
+        leaving = true;
+        if (!SceneNavigation.Load(SceneNavigation.MainMenuPath, this)) leaving = false;
+    }
+
+    public void Quit()
+    {
+        if (!resultShown || leaving) return;
+        leaving = true;
+        SceneNavigation.Quit();
+    }
 
     [ContextMenu("Reset Best Score")]
     private void ResetBestScore()
@@ -63,7 +88,7 @@ public class GameOverUI : MonoBehaviour
         resultShown = true;
         // Score actual survival time, excluding the skipped part of a range test.
         int score = Mathf.Max(0, Mathf.FloorToInt(survivalTimer.ElapsedSeconds));
-        int previousBest = Mathf.Max(0, PlayerPrefs.GetInt(BestScoreKey, 0));
+        int previousBest = BestScore;
         bool newRecord = score > previousBest;
         int best = Mathf.Max(score, previousBest);
         if (newRecord)
@@ -79,7 +104,7 @@ public class GameOverUI : MonoBehaviour
             newRecordText.text = "NEW RECORD!";
             newRecordText.gameObject.SetActive(newRecord);
         }
-        gameOverPanel.SetActive(true);
+        resultFade = StartCoroutine(UiTransition.Panel(gameOverPanel, true, resultFadeSeconds));
         if (newRecordConfetti != null)
         {
             if (newRecord) newRecordConfetti.Play();
@@ -96,6 +121,8 @@ public class GameOverUI : MonoBehaviour
 
     private void OnDisable()
     {
+        if (resultFade != null) StopCoroutine(resultFade);
+        UiTransition.ResetPanel(gameOverPanel);
         if (player != null) player.HealthChanged -= OnHealthChanged;
         if (newRecordConfetti != null) newRecordConfetti.Stop();
     }
